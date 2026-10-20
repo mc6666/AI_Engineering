@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WebRTC P2P Demo</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+        }
+
+        #messages {
+            border: 1px solid #ccc;
+            height: 250px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .videos {
+            display: flex;
+            gap: 20px;
+        }
+
+        .video-box {
+            flex: 1;
+        }
+
+        video {
+            width: 100%;
+            background: #222;
+            border-radius: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>WebRTC P2P Demo</h1>
+    <button id="connect">
+        Connect
+    </button>
+    <button id="create_offer">
+        Create Offer
+    </button>
+    <button id="disconnect">
+        Disconnect
+    </button>
+    <div class="videos">
+        <div class="video-box">
+            <h3>Local Video</h3>
+            <video
+                id="localVideo"
+                autoplay
+                muted
+                playsinline
+            ></video>
+        </div>
+
+        <div class="video-box">
+            <h3>Remote Video</h3>
+            <video
+                id="remoteVideo"
+                autoplay
+                playsinline
+            ></video>
+        </div>
+    </div>
+    <div>
+        Message to send:
+    </div>
+    <div>
+        <textarea id="message" name="feedback" rows="4" cols="80"></textarea>
+    </div>
+    <div>
+        <button id="send">
+            Send P2P Message
+        </button>
+    </div>
+    <div id="status">
+        Disconnected
+    </div>
+    <h3>Messages</h3>
+    <div id="messages"></div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

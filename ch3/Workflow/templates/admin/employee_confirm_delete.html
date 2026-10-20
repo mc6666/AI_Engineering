@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}刪除員工{% endblock %}
+{% block breadcrumb %}<a href="{% url 'employee_list' %}">員工維護</a> / 刪除{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-5">
+<div class="card p-4 text-center">
+  <i class="bi bi-exclamation-triangle-fill fs-1 text-warning mb-3"></i>
+  <h5>確定刪除員工「{{ emp.name }}」？</h5>
+  <p class="text-muted small">此操作將同時刪除對應的使用者帳號，無法復原。</p>
+  <form method="post" class="d-flex gap-2 justify-content-center mt-3">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">確定刪除</button>
+    <a href="{% url 'employee_list' %}" class="btn btn-outline-secondary">取消</a>
+  </form>
+</div>
+</div>
+</div>
+{% endblock %}

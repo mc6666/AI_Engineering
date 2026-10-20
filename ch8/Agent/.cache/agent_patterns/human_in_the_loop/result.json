@@ -1,0 +1,506 @@
+{
+  "$schemaVersion": "1.16",
+  "current_turn": 1,
+  "current_agent": {
+    "name": "Weather Assistant"
+  },
+  "original_input": "What is the weather and temperature in Oakland?",
+  "pending_input": [],
+  "model_responses": [
+    {
+      "usage": {
+        "requests": 1,
+        "input_tokens": 96,
+        "input_tokens_details": [
+          {
+            "cache_write_tokens": 0,
+            "cached_tokens": 0
+          }
+        ],
+        "output_tokens": 50,
+        "output_tokens_details": [
+          {
+            "reasoning_tokens": 0
+          }
+        ],
+        "total_tokens": 146,
+        "request_usage_entries": []
+      },
+      "output": [
+        {
+          "arguments": "{\"city\":\"Oakland\"}",
+          "call_id": "call_QO6fs9LaHquIT5mzvLMHL5iU",
+          "name": "get_weather",
+          "type": "function_call",
+          "id": "fc_0338a2d3ebfcd102006a9ecd753e1087d0b88a66954f9c65c9",
+          "status": "completed"
+        },
+        {
+          "arguments": "{\"city\":\"Oakland\"}",
+          "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+          "name": "get_temperature",
+          "type": "function_call",
+          "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+          "status": "completed"
+        }
+      ],
+      "response_id": "resp_0338a2d3ebfcd102006a9ecd731b9487d08d41a2f2fc465861",
+      "request_id": "req_09c2b5dde5444895bad4191d9a260c75"
+    }
+  ],
+  "context": {
+    "usage": {
+      "requests": 1,
+      "input_tokens": 96,
+      "input_tokens_details": [
+        {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        }
+      ],
+      "output_tokens": 50,
+      "output_tokens_details": [
+        {
+          "reasoning_tokens": 0
+        }
+      ],
+      "total_tokens": 146,
+      "request_usage_entries": [
+        {
+          "input_tokens": 96,
+          "output_tokens": 50,
+          "total_tokens": 146,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cached_tokens": 0
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        }
+      ]
+    },
+    "approvals": {},
+    "tool_invocations": {
+      "call_QO6fs9LaHquIT5mzvLMHL5iU": {
+        "type": "function_call",
+        "approval_scope": "ebfaafc0dd470214bab3421e81676cb703ed4adbebb486804c7298f6ed89cf6a",
+        "fingerprint": "76e4a7b971e8adcae10c4424c34a6eb604e8d5ae6c4d02f3b9892509f9386804",
+        "executed": true,
+        "completed": true
+      },
+      "call_NYUByaGWo4rA7sCwLEHi40Qs": {
+        "type": "function_call",
+        "approval_scope": "912bdbe47380a767c9ef60b468f366b214dc3ec0fe559e72ac8f5f462f4ea826",
+        "fingerprint": "596b2dd200208242a6ce1d0fe7b4deddac4d807c0a28c2023c3c533b36cd99f0",
+        "executed": false,
+        "completed": false
+      }
+    },
+    "context": null,
+    "context_meta": {
+      "original_type": "none",
+      "serialized_via": "none",
+      "requires_deserializer": false,
+      "omitted": false
+    }
+  },
+  "tool_use_tracker": {
+    "Weather Assistant": [
+      "get_weather",
+      "get_temperature"
+    ]
+  },
+  "max_turns": 10,
+  "no_active_agent_run": true,
+  "input_guardrail_results": [],
+  "output_guardrail_results": [],
+  "tool_input_guardrail_results": [],
+  "tool_output_guardrail_results": [],
+  "conversation_id": null,
+  "previous_response_id": null,
+  "auto_previous_response_id": false,
+  "generated_prompt_cache_key": "agents-sdk:run:20ab8d11c84d4791932156e6edb55f88",
+  "reasoning_item_id_policy": null,
+  "nested_history_owned_session_item_refs": [],
+  "generated_session_item_indexes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "generated_items": [
+    {
+      "type": "tool_call_item",
+      "raw_item": {
+        "arguments": "{\"city\":\"Oakland\"}",
+        "call_id": "call_QO6fs9LaHquIT5mzvLMHL5iU",
+        "name": "get_weather",
+        "type": "function_call",
+        "id": "fc_0338a2d3ebfcd102006a9ecd753e1087d0b88a66954f9c65c9",
+        "status": "completed"
+      },
+      "agent": {
+        "name": "Weather Assistant"
+      },
+      "tool_name": "get_weather",
+      "description": "",
+      "tool_origin": {
+        "type": "function"
+      }
+    },
+    {
+      "type": "tool_call_item",
+      "raw_item": {
+        "arguments": "{\"city\":\"Oakland\"}",
+        "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+        "name": "get_temperature",
+        "type": "function_call",
+        "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+        "status": "completed"
+      },
+      "agent": {
+        "name": "Weather Assistant"
+      },
+      "tool_name": "get_temperature",
+      "description": "",
+      "tool_origin": {
+        "type": "function"
+      }
+    },
+    {
+      "type": "tool_call_output_item",
+      "raw_item": {
+        "call_id": "call_QO6fs9LaHquIT5mzvLMHL5iU",
+        "output": "The weather in Oakland is sunny",
+        "type": "function_call_output"
+      },
+      "agent": {
+        "name": "Weather Assistant"
+      },
+      "output": "The weather in Oakland is sunny",
+      "tool_origin": {
+        "type": "function"
+      }
+    },
+    {
+      "type": "tool_approval_item",
+      "raw_item": {
+        "arguments": "{\"city\":\"Oakland\"}",
+        "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+        "name": "get_temperature",
+        "type": "function_call",
+        "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+        "status": "completed"
+      },
+      "agent": {
+        "name": "Weather Assistant"
+      },
+      "tool_name": "get_temperature",
+      "tool_lookup_key": {
+        "kind": "bare",
+        "name": "get_temperature"
+      },
+      "tool_origin": {
+        "type": "function"
+      }
+    }
+  ],
+  "session_items": [
+    {
+      "type": "tool_call_item",
+      "raw_item": {
+        "arguments": "{\"city\":\"Oakland\"}",
+        "call_id": "call_QO6fs9LaHquIT5mzvLMHL5iU",
+        "name": "get_weather",
+        "type": "function_call",
+        "id": "fc_0338a2d3ebfcd102006a9ecd753e1087d0b88a66954f9c65c9",
+        "status": "completed"
+      },
+      "agent": {
+        "name": "Weather Assistant"
+      },
+      "tool_name": "get_weather",
+      "description": "",
+      "tool_origin": {
+        "type": "function"
+      }
+    },
+    {
+      "type": "tool_call_item",
+      "raw_item": {
+        "arguments": "{\"city\":\"Oakland\"}",
+        "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+        "name": "get_temperature",
+        "type": "function_call",
+        "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+        "status": "completed"
+      },
+      "agent": {
+        "name": "Weather Assistant"
+      },
+      "tool_name": "get_temperature",
+      "description": "",
+      "tool_origin": {
+        "type": "function"
+      }
+    },
+    {
+      "type": "tool_call_output_item",
+      "raw_item": {
+        "call_id": "call_QO6fs9LaHquIT5mzvLMHL5iU",
+        "output": "The weather in Oakland is sunny",
+        "type": "function_call_output"
+      },
+      "agent": {
+        "name": "Weather Assistant"
+      },
+      "output": "The weather in Oakland is sunny",
+      "tool_origin": {
+        "type": "function"
+      }
+    },
+    {
+      "type": "tool_approval_item",
+      "raw_item": {
+        "arguments": "{\"city\":\"Oakland\"}",
+        "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+        "name": "get_temperature",
+        "type": "function_call",
+        "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+        "status": "completed"
+      },
+      "agent": {
+        "name": "Weather Assistant"
+      },
+      "tool_name": "get_temperature",
+      "tool_lookup_key": {
+        "kind": "bare",
+        "name": "get_temperature"
+      },
+      "tool_origin": {
+        "type": "function"
+      }
+    }
+  ],
+  "current_step": {
+    "type": "next_step_interruption",
+    "data": {
+      "interruptions": [
+        {
+          "type": "tool_approval_item",
+          "raw_item": {
+            "arguments": "{\"city\":\"Oakland\"}",
+            "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+            "name": "get_temperature",
+            "type": "function_call",
+            "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+            "status": "completed"
+          },
+          "agent": {
+            "name": "Weather Assistant"
+          },
+          "tool_name": "get_temperature",
+          "tool_origin": {
+            "type": "function"
+          },
+          "tool_lookup_key": {
+            "kind": "bare",
+            "name": "get_temperature"
+          }
+        }
+      ],
+      "response_accepted": false,
+      "llm_end_hooks_started": true
+    }
+  },
+  "last_model_response": {
+    "usage": {
+      "requests": 1,
+      "input_tokens": 96,
+      "input_tokens_details": [
+        {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        }
+      ],
+      "output_tokens": 50,
+      "output_tokens_details": [
+        {
+          "reasoning_tokens": 0
+        }
+      ],
+      "total_tokens": 146,
+      "request_usage_entries": []
+    },
+    "output": [
+      {
+        "arguments": "{\"city\":\"Oakland\"}",
+        "call_id": "call_QO6fs9LaHquIT5mzvLMHL5iU",
+        "name": "get_weather",
+        "type": "function_call",
+        "id": "fc_0338a2d3ebfcd102006a9ecd753e1087d0b88a66954f9c65c9",
+        "status": "completed"
+      },
+      {
+        "arguments": "{\"city\":\"Oakland\"}",
+        "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+        "name": "get_temperature",
+        "type": "function_call",
+        "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+        "status": "completed"
+      }
+    ],
+    "response_id": "resp_0338a2d3ebfcd102006a9ecd731b9487d08d41a2f2fc465861",
+    "request_id": "req_09c2b5dde5444895bad4191d9a260c75"
+  },
+  "last_processed_response": {
+    "new_items": [
+      {
+        "type": "tool_call_item",
+        "raw_item": {
+          "arguments": "{\"city\":\"Oakland\"}",
+          "call_id": "call_QO6fs9LaHquIT5mzvLMHL5iU",
+          "name": "get_weather",
+          "type": "function_call",
+          "id": "fc_0338a2d3ebfcd102006a9ecd753e1087d0b88a66954f9c65c9",
+          "status": "completed"
+        },
+        "agent": {
+          "name": "Weather Assistant"
+        },
+        "tool_name": "get_weather",
+        "description": "",
+        "tool_origin": {
+          "type": "function"
+        }
+      },
+      {
+        "type": "tool_call_item",
+        "raw_item": {
+          "arguments": "{\"city\":\"Oakland\"}",
+          "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+          "name": "get_temperature",
+          "type": "function_call",
+          "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+          "status": "completed"
+        },
+        "agent": {
+          "name": "Weather Assistant"
+        },
+        "tool_name": "get_temperature",
+        "description": "",
+        "tool_origin": {
+          "type": "function"
+        }
+      }
+    ],
+    "tools_used": [
+      "get_weather",
+      "get_temperature"
+    ],
+    "functions": [
+      {
+        "tool_call": {
+          "arguments": "{\"city\":\"Oakland\"}",
+          "call_id": "call_QO6fs9LaHquIT5mzvLMHL5iU",
+          "name": "get_weather",
+          "type": "function_call",
+          "id": "fc_0338a2d3ebfcd102006a9ecd753e1087d0b88a66954f9c65c9",
+          "status": "completed"
+        },
+        "tool": {
+          "name": "get_weather",
+          "lookupKey": {
+            "kind": "bare",
+            "name": "get_weather"
+          },
+          "description": "",
+          "paramsJsonSchema": {
+            "properties": {
+              "city": {
+                "title": "City",
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ],
+            "title": "get_weather_args",
+            "type": "object",
+            "additionalProperties": false
+          }
+        }
+      },
+      {
+        "tool_call": {
+          "arguments": "{\"city\":\"Oakland\"}",
+          "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+          "name": "get_temperature",
+          "type": "function_call",
+          "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+          "status": "completed"
+        },
+        "tool": {
+          "name": "get_temperature",
+          "lookupKey": {
+            "kind": "bare",
+            "name": "get_temperature"
+          },
+          "description": "",
+          "paramsJsonSchema": {
+            "properties": {
+              "city": {
+                "title": "City",
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ],
+            "title": "get_temperature_args",
+            "type": "object",
+            "additionalProperties": false
+          }
+        }
+      }
+    ],
+    "computer_actions": [],
+    "custom_tool_actions": [],
+    "local_shell_actions": [],
+    "shell_actions": [],
+    "apply_patch_actions": [],
+    "handoffs": [],
+    "mcp_approval_requests": [],
+    "interruptions": [
+      {
+        "type": "tool_approval_item",
+        "raw_item": {
+          "arguments": "{\"city\":\"Oakland\"}",
+          "call_id": "call_NYUByaGWo4rA7sCwLEHi40Qs",
+          "name": "get_temperature",
+          "type": "function_call",
+          "id": "fc_0338a2d3ebfcd102006a9ecd753e2c87d09eacee4a37c453cc",
+          "status": "completed"
+        },
+        "agent": {
+          "name": "Weather Assistant"
+        },
+        "tool_name": "get_temperature",
+        "tool_origin": {
+          "type": "function"
+        },
+        "tool_lookup_key": {
+          "kind": "bare",
+          "name": "get_temperature"
+        }
+      }
+    ]
+  },
+  "current_turn_persisted_item_count": 0,
+  "trace": {
+    "object": "trace",
+    "id": "trace_eed732ed61b44165b663b9439fb76b66",
+    "workflow_name": "Agent workflow"
+  }
+}

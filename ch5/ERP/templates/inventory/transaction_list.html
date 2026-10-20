@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}庫存異動明細{% endblock %}
+{% block page_title %}庫存異動明細{% endblock %}
+{% block content %}
+<table class="table table-bordered">
+<thead><tr><th>交易編號</th><th>類型</th><th>商品</th><th>倉庫</th><th>數量</th><th>單位成本</th><th>交易日期</th><th>來源單據</th><th>操作者</th></tr></thead>
+<tbody>
+{% for t in transactions %}
+<tr><td>{{ t.transaction_no }}</td><td>{{ t.get_transaction_type_display }}</td><td>{{ t.item }}</td><td>{{ t.warehouse }}</td><td>{{ t.quantity }}</td><td>{{ t.unit_cost }}</td><td>{{ t.transaction_date }}</td><td>{{ t.reference_document }}</td><td>{{ t.user }}</td></tr>
+{% empty %}<tr><td colspan="9">尚無交易紀錄</td></tr>{% endfor %}
+</tbody>
+</table>
+{% if is_paginated %}
+<nav><ul class="pagination">
+{% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">上一頁</a></li>{% endif %}
+<li class="page-item disabled"><span class="page-link">第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 頁</span></li>
+{% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">下一頁</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

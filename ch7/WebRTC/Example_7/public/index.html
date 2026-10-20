@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WebRTC P2P Demo</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+        }
+
+        #messages {
+            border: 1px solid #ccc;
+            height: 250px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .videos {
+            display: flex;
+            gap: 20px;
+        }
+
+        .video-box {
+            flex: 1;
+        }
+
+        video {
+            width: 100%;
+            background: #222;
+            border-radius: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>WebRTC P2P Demo</h1>
+    <button id="connect">
+        Connect
+    </button>
+    <div class="videos">
+        <div class="video-box">
+            <h3>Local Audio</h3>
+            <video
+                id="audio"
+                playsinline
+            ></video>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}表單設計{% endblock %}
+{% block breadcrumb %}<a href="{% url 'workflow_list' %}">簽核類別</a> / {{ wf.name }} / 表單設計{% endblock %}
+{% block extra_head %}
+<style>
+  .field-row { background: #f8f9fa; border-radius: 0.4rem; }
+  #preview-area { background: #fff; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 1.5rem; min-height: 200px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0">{{ wf.name }} - 表單設計</h4>
+  <a href="{% url 'workflow_list' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>返回</a>
+</div>
+
+<div class="row g-3">
+<div class="col-md-6">
+<div class="card p-4">
+  <h6 class="fw-semibold mb-3">欄位定義</h6>
+  <div id="fieldsContainer">
+    {% for field in template.field_schema %}
+    <div class="field-row d-flex gap-2 align-items-center p-2 mb-2">
+      <select name="field_type" class="form-select form-select-sm field-type" style="width:110px">
+        <option value="text" {% if field.type == 'text' %}selected{% endif %}>文字</option>
+        <option value="textarea" {% if field.type == 'textarea' %}selected{% endif %}>多行</option>
+        <option value="number" {% if field.type == 'number' %}selected{% endif %}>數字</option>
+        <option value="date" {% if field.type == 'date' %}selected{% endif %}>日期</option>
+        <option value="select" {% if field.type == 'select' %}selected{% endif %}>下拉</option>
+        <option value="checkbox" {% if field.type == 'checkbox' %}selected{% endif %}>勾選</option>
+      </select>
+      <input type="text" placeholder="欄位名稱(name)" class="form-control form-control-sm field-name" value="{{ field.name }}">
+      <input type="text" placeholder="標籤(label)" class="form-control form-control-sm field-label" value="{{ field.label }}">
+      <div class="form-check form-switch mb-0">
+        <input type="checkbox" class="form-check-input field-required" {% if field.required %}checked{% endif %}>
+        <label class="form-check-label small">必填</label>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline-danger remove-field"><i class="bi bi-x"></i></button>
+    </div>
+    {% endfor %}
+  </div>
+  <button type="button" class="btn btn-outline-primary btn-sm mt-1" id="addField">
+    <i class="bi bi-plus-lg me-1"></i>新增欄位
+  </button>
+</div>
+</div>
+
+<div class="col-md-6">
+<div class="card p-4">
+  <div class="d-flex justify-content-between mb-3">
+    <h6 class="fw-semibold mb-0">預覽</h6>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshPreview">重新整理</button>
+  </div>
+  <div id="preview-area"></div>
+</div>
+</div>
+</div>
+
+<form method="post" id="saveForm" class="mt-3">
+  {% csrf_token %}
+  <input type="hidden" name="html_content" id="html_content" value="{{ template.html_content }}">
+  <input type="hidden" name="field_schema" id="field_schema" value="{{ template.field_schema|default:'[]' }}">
+  <button type="button" class="btn btn-primary" id="saveBtn"><i class="bi bi-floppy me-1"></i>儲存表單</button>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function buildSchema() {
+  const rows = document.querySelectorAll('#fieldsContainer .field-row');
+  return Array.from(rows).map(row => ({
+    type: row.querySelector('.field-type').value,
+    name: row.querySelector('.field-name').value.trim().replace(/\s+/g, '_'),
+    label: row.querySelector('.field-label').value.trim(),
+    required: row.querySelector('.field-required').checked,
+  })).filter(f => f.name);
+}
+
+function buildHtml(schema) {
+  return schema.map(f => {
+    const req = f.required ? 'required' : '';
+    const label = `<label class="form-label">${f.label}${f.required ? ' <span class="text-danger">*</span>' : ''}</label>`;
+    if (f.type === 'textarea') return `<div class="mb-3">${label}<textarea name="${f.name}" class="form-control" ${req}></textarea></div>`;
+    if (f.type === 'select') return `<div class="mb-3">${label}<select name="${f.name}" class="form-select" ${req}><option value="">請選擇</option></select></div>`;
+    if (f.type === 'checkbox') return `<div class="mb-3 form-check"><input type="checkbox" name="${f.name}" class="form-check-input" ${req}><label class="form-check-label">${f.label}</label></div>`;
+    return `<div class="mb-3">${label}<input type="${f.type}" name="${f.name}" class="form-control" ${req}></div>`;
+  }).join('\n');
+}
+
+function updatePreview() {
+  const schema = buildSchema();
+  document.getElementById('preview-area').innerHTML = buildHtml(schema) || '<p class="text-muted">尚無欄位</p>';
+}
+
+document.getElementById('refreshPreview').addEventListener('click', updatePreview);
+
+document.getElementById('addField').addEventListener('click', () => {
+  const row = document.createElement('div');
+  row.className = 'field-row d-flex gap-2 align-items-center p-2 mb-2';
+  row.innerHTML = `
+    <select name="field_type" class="form-select form-select-sm field-type" style="width:110px">
+      <option value="text">文字</option><option value="textarea">多行</option>
+      <option value="number">數字</option><option value="date">日期</option>
+      <option value="select">下拉</option><option value="checkbox">勾選</option>
+    </select>
+    <input type="text" placeholder="欄位名稱(name)" class="form-control form-control-sm field-name">
+    <input type="text" placeholder="標籤(label)" class="form-control form-control-sm field-label">
+    <div class="form-check form-switch mb-0">
+      <input type="checkbox" class="form-check-input field-required">
+      <label class="form-check-label small">必填</label>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-danger remove-field"><i class="bi bi-x"></i></button>`;
+  row.querySelector('.remove-field').addEventListener('click', () => row.remove());
+  document.getElementById('fieldsContainer').appendChild(row);
+});
+
+document.getElementById('fieldsContainer').addEventListener('click', e => {
+  if (e.target.closest('.remove-field')) e.target.closest('.field-row').remove();
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const schema = buildSchema();
+  document.getElementById('field_schema').value = JSON.stringify(schema);
+  document.getElementById('html_content').value = buildHtml(schema);
+  document.getElementById('saveForm').submit();
+});
+
+updatePreview();
+</script>
+{% endblock %}

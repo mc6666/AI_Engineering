@@ -1,0 +1,43 @@
+[
+  {
+    "label": "庫存管理",
+    "icon": "bi bi-boxes",
+    "children": [
+      { "code": "inventory.dashboard", "label": "庫存儀表板", "path": "/portal/inventory/dashboard", "icon": "bi bi-speedometer2" },
+      { "code": "inventory.items", "label": "商品主檔", "path": "/portal/inventory/items", "icon": "bi bi-box-seam" },
+      { "code": "inventory.warehouses", "label": "倉庫管理", "path": "/portal/inventory/warehouses", "icon": "bi bi-building" },
+      { "code": "inventory.receipts", "label": "入庫管理", "path": "/portal/inventory/receipts", "icon": "bi bi-box-arrow-in-down" },
+      { "code": "inventory.issues", "label": "出庫管理", "path": "/portal/inventory/issues", "icon": "bi bi-box-arrow-up" },
+      { "code": "inventory.transfers", "label": "庫存調撥", "path": "/portal/inventory/transfers", "icon": "bi bi-arrow-left-right" },
+      { "code": "inventory.adjustments", "label": "庫存調整", "path": "/portal/inventory/adjustments", "icon": "bi bi-sliders" },
+      { "code": "inventory.cycle_counts", "label": "循環盤點", "path": "/portal/inventory/cycle-counts", "icon": "bi bi-clipboard-check" },
+      { "code": "inventory.physical_counts", "label": "全面盤點", "path": "/portal/inventory/physical-counts", "icon": "bi bi-clipboard-data" },
+      { "code": "inventory.reorder", "label": "補貨建議", "path": "/portal/inventory/reorder", "icon": "bi bi-arrow-repeat" },
+      { "code": "inventory.reports", "label": "庫存報表", "path": "/portal/inventory/reports", "icon": "bi bi-bar-chart" }
+    ]
+  },
+  {
+    "label": "採購管理",
+    "icon": "bi bi-cart4",
+    "children": [
+      { "code": "purchase.dashboard", "label": "採購儀表板", "path": "/portal/purchase/dashboard", "icon": "bi bi-speedometer2" },
+      { "code": "purchase.suppliers", "label": "供應商管理", "path": "/portal/purchase/suppliers", "icon": "bi bi-truck" },
+      { "code": "purchase.requisitions", "label": "請購單", "path": "/portal/purchase/requisitions", "icon": "bi bi-file-earmark-text" },
+      { "code": "purchase.rfq", "label": "詢價比價", "path": "/portal/purchase/rfq", "icon": "bi bi-envelope-paper" },
+      { "code": "purchase.orders", "label": "採購訂單", "path": "/portal/purchase/orders", "icon": "bi bi-file-earmark-ruled" },
+      { "code": "purchase.receipts", "label": "收貨管理", "path": "/portal/purchase/receipts", "icon": "bi bi-box-arrow-in-down" },
+      { "code": "purchase.invoices", "label": "供應商發票", "path": "/portal/purchase/invoices", "icon": "bi bi-receipt" }
+    ]
+  },
+  {
+    "label": "銷售管理",
+    "icon": "bi bi-shop",
+    "children": [
+      { "code": "sales.dashboard", "label": "銷售儀表板", "path": "/portal/sales/dashboard", "icon": "bi bi-speedometer2" },
+      { "code": "sales.customers", "label": "客戶管理", "path": "/portal/sales/customers", "icon": "bi bi-people" },
+      { "code": "sales.orders", "label": "銷售訂單", "path": "/portal/sales/orders", "icon": "bi bi-file-earmark-ruled" },
+      { "code": "sales.shipments", "label": "出貨管理", "path": "/portal/sales/shipments", "icon": "bi bi-truck" },
+      { "code": "sales.invoices", "label": "應收發票", "path": "/portal/sales/invoices", "icon": "bi bi-receipt" }
+    ]
+  }
+]

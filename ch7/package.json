@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "audio-decode": "^3.12.0",
+    "express": "^5.2.1",
+    "ws": "^8.21.3"
+  }
+}

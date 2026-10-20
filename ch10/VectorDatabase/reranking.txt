@@ -1,0 +1,11 @@
+please reranking the following documents with "tomorrow weather": 
+1.	I had chocolate chip pancakes and scrambled eggs for breakfast this morning.
+2.	The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees.
+3.	I will go shopping tomorrow if weather is sunny. I will stay home if tomorrow weather is cloudy or raining.
+4.	Robbers broke into the city bank and stole $1 million in cash.
+5.	Wow! That was an amazing movie. I can't wait to see it again.
+6.	Is the new iPhone worth the price? Read this review to find out.
+7.	The top 10 soccer players in the world right now.
+8.	LangGraph is the best framework for building stateful, agentic applications!
+9.	The stock market is down 500 points today due to fears of a recession.
+10.	I have a bad feeling I am going to get deleted :(

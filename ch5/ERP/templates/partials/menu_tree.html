@@ -1,0 +1,18 @@
+{% load menu_tags %}
+<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu">
+{% for node in nodes %}
+  <li class="nav-item{% if node.children %} has-treeview{% endif %}">
+    <a href="{{ node.url }}" class="nav-link">
+      {% if node.icon %}<i class="nav-icon {{ node.icon }}"></i>{% endif %}
+      <p>{{ node.title }}
+        {% if node.children %}<i class="nav-arrow bi bi-chevron-right"></i>{% endif %}
+      </p>
+    </a>
+    {% if node.children %}
+    <ul class="nav nav-treeview">
+      {% render_menu node.children %}
+    </ul>
+    {% endif %}
+  </li>
+{% endfor %}
+</ul>

@@ -1,0 +1,67 @@
+{% extends "recommender/base.html" %}
+
+{% block title %}選擇 YouTuber · 美食推薦{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <h2 class="mb-1">你想跟哪位 YouTuber 一起吃？</h2>
+    <p class="text-muted mb-4">勾選一位或多位美食 YouTuber，讓 AI 根據他們的風格推薦適合你的美食。</p>
+
+    <form method="post" action="{% url 'recommender:suggest' %}">
+      {% csrf_token %}
+
+      <div class="row g-3 mb-4">
+        {% for yt in youtubers %}
+        <div class="col-6 col-md-4">
+          <label class="w-100 h-100" style="cursor:pointer;">
+            <div class="card youtuber-card p-3 h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold">{{ yt.name }}</span>
+                <input type="checkbox" name="youtuber_ids" value="{{ yt.pk }}"
+                       class="form-check-input yt-check flex-shrink-0"
+                       style="width:1.2em;height:1.2em;">
+              </div>
+              <div class="text-muted small mb-1">{{ yt.channel_name }}</div>
+              <div class="text-secondary" style="font-size:.82rem;">{{ yt.style_keywords }}</div>
+              {% if yt.youtube_url %}
+              <a href="{{ yt.youtube_url }}" target="_blank"
+                 class="mt-2 small text-danger text-decoration-none"
+                 onclick="event.stopPropagation()">▶ 頻道連結</a>
+              {% endif %}
+            </div>
+          </label>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="alert alert-warning">
+            尚未有 YouTuber 資料，請先執行 <code>python manage.py seed_youtubers</code> 或至
+            <a href="/admin/">管理後台</a> 新增。
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="card p-4 mb-3">
+        <label class="form-label fw-bold fs-5">你想吃什麼？</label>
+        <textarea name="user_query" class="form-control" rows="3"
+          placeholder="例如：想吃便宜又好吃的在地小吃、下午茶甜點推薦、台南必吃美食…"></textarea>
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-danger btn-lg">🤖 讓 AI 幫我推薦</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.yt-check').forEach(cb => {
+  cb.addEventListener('change', () => {
+    cb.closest('.youtuber-card').classList.toggle('selected', cb.checked);
+  });
+});
+</script>
+{% endblock %}

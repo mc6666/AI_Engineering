@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}詢價單明細{% endblock %}
+{% block page_title %}詢價單：{{ rfq.rfq_number }}{% endblock %}
+{% block content %}
+<p>報價截止日：{{ rfq.quote_deadline|default:'-' }}｜狀態：{{ rfq.get_status_display }}</p>
+{% if rfq.status == 'DRAFT' %}
+<form method="post" action="{% url 'purchase:rfq_send' rfq.pk %}" class="mb-3">{% csrf_token %}<button class="btn btn-primary">發送詢價單給供應商</button></form>
+{% endif %}
+
+<div class="card">
+<div class="card-header">受邀供應商</div>
+<div class="card-body p-0">
+<table class="table mb-0">
+<thead><tr><th>供應商</th><th>發送時間</th><th>已回覆</th></tr></thead>
+<tbody>
+{% for rs in rfq_suppliers %}
+<tr><td>{{ rs.supplier }}</td><td>{{ rs.sent_at|default:'-' }}</td><td>{% if rs.replied %}是{% else %}否{% endif %}</td></tr>
+{% empty %}<tr><td colspan="3">尚無供應商</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">登錄供應商報價</div>
+<div class="card-body">
+<form method="post" action="{% url 'purchase:quotation_add' rfq.pk %}">
+{% csrf_token %}
+{{ quotation_form.as_p }}
+<button class="btn btn-primary">登錄報價</button>
+</form>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">報價比較</div>
+<div class="card-body p-0">
+<table class="table mb-0">
+<thead><tr><th>供應商</th><th>商品</th><th>單價</th><th>總成本(含運費)</th><th>交期</th><th>付款條件</th><th>保固</th><th>供應商評等</th></tr></thead>
+<tbody>
+{% for row in comparison %}
+<tr class="{% if recommended and row.quotation.pk == recommended.quotation.pk %}table-success{% endif %}">
+<td>{{ row.supplier }}</td><td>{{ row.item }}</td><td>{{ row.unit_price }}</td><td>{{ row.total_cost }}</td><td>{{ row.lead_time_days }} 天</td><td>{{ row.payment_terms }}</td><td>{{ row.warranty }}</td><td>{{ row.rating }}</td>
+</tr>
+{% empty %}<tr><td colspan="8">尚無報價資料</td></tr>{% endfor %}
+</tbody>
+</table>
+{% if recommended %}
+<p class="p-3 mb-0"><strong>建議供應商：</strong>{{ recommended.supplier }}（總成本 {{ recommended.total_cost }}）</p>
+{% endif %}
+</div>
+</div>
+{% endblock %}

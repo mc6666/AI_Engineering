@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}撤回案件{% endblock %}
+{% block breadcrumb %}<a href="{% url 'my_cases' %}">我的案件</a> / 撤回{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-5">
+<div class="card p-4 text-center">
+  <i class="bi bi-arrow-counterclockwise fs-1 text-warning mb-3"></i>
+  <h5>確定撤回申請？</h5>
+  <p class="fw-semibold">{{ case.subject }}</p>
+  <p class="text-muted small">撤回後案件將無法繼續審核流程。</p>
+  <form method="post" class="d-flex gap-2 justify-content-center mt-3">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-warning">確定撤回</button>
+    <a href="{% url 'my_cases' %}" class="btn btn-outline-secondary">取消</a>
+  </form>
+</div>
+</div>
+</div>
+{% endblock %}

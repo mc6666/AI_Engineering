@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}供應商管理{% endblock %}
+{% block page_title %}供應商管理{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <a href="{% url 'purchase:supplier_scorecard' %}" class="btn btn-outline-secondary">供應商績效評分卡</a>
+  <a href="{% url 'purchase:supplier_add' %}" class="btn btn-primary">新增供應商</a>
+</div>
+<table class="table table-bordered">
+<thead><tr><th>代號</th><th>名稱</th><th>付款條件</th><th>信用額度</th><th>評等</th><th>啟用</th><th>操作</th></tr></thead>
+<tbody>
+{% for s in suppliers %}
+<tr>
+<td>{{ s.supplier_id }}</td><td>{{ s.supplier_name }}</td><td>{{ s.payment_terms }}</td><td>{{ s.credit_limit }}</td><td>{{ s.rating }}</td>
+<td>{% if s.is_active %}是{% else %}否{% endif %}</td>
+<td><a href="{% url 'purchase:supplier_edit' s.pk %}" class="btn btn-sm btn-secondary">編輯</a> <a href="{% url 'purchase:supplier_delete' s.pk %}" class="btn btn-sm btn-danger">刪除</a></td>
+</tr>
+{% empty %}<tr><td colspan="7">尚無供應商資料</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}請購單{% endblock %}
+{% block page_title %}請購單管理{% endblock %}
+{% block content %}
+<a href="{% url 'purchase:requisition_add' %}" class="btn btn-primary mb-3">建立請購單</a>
+<table class="table table-bordered">
+<thead><tr><th>請購單號</th><th>申請人</th><th>部門</th><th>預算代碼</th><th>狀態</th><th>操作</th></tr></thead>
+<tbody>
+{% for pr in requisitions %}
+<tr>
+<td><a href="{% url 'purchase:requisition_detail' pr.pk %}">{{ pr.pr_number }}</a></td>
+<td>{{ pr.applicant }}</td><td>{{ pr.department }}</td><td>{{ pr.budget_code }}</td><td>{{ pr.get_status_display }}</td>
+<td><a href="{% url 'purchase:requisition_detail' pr.pk %}" class="btn btn-sm btn-secondary">檢視</a></td>
+</tr>
+{% empty %}<tr><td colspan="6">尚無請購單</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

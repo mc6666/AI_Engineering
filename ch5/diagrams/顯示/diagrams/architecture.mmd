@@ -1,0 +1,66 @@
+flowchart LR
+    Browser[Browser<br/>User - any role]
+
+    subgraph process["Single Django Process (erp/ project)"]
+        Router[Django Core<br/>erp/urls.py router<br/>wsgi.py / asgi.py / settings.py]
+        Accounts[accounts app<br/>/accounts/<br/>login, register, password change]
+        Backend[backend app<br/>/back/<br/>Role/Function CRUD - is_staff gated]
+        Frontend[frontend app<br/>/front/<br/>front-office index]
+        Core[core app<br/>sidebar_menu context processor]
+        MenuJSON[(static/data/*.json<br/>backend_menu.json<br/>frontend_menu.json)]
+
+        subgraph business["Business Domain Apps"]
+            Purchase[purchase app<br/>/front/purchase/<br/>Supplier, Requisition, RFQ, PO, GR, Invoice]
+            Sales[sales app<br/>/front/sales/<br/>Customer, SO, Picking, Shipment, AR]
+            Inventory[inventory app<br/>/front/inventory/<br/>Item, Warehouse, Stock, Lot/Serial - base]
+        end
+
+        Templates[Templates<br/>Django Template Language<br/>base.html + AdminLTE UI]
+    end
+
+    CDN[/jsDelivr CDN<br/>AdminLTE 4, Bootstrap 5,<br/>Popper, OverlayScrollbars/]
+    DB[(SQLite<br/>db.sqlite3)]
+
+    Browser -->|HTTP request| Router
+    Router --> Accounts
+    Router --> Backend
+    Router --> Frontend
+    Router --> Purchase
+    Router --> Sales
+    Router --> Inventory
+
+    Core --> MenuJSON
+    Core -.sidebar context.-> Templates
+
+    Purchase -->|inventory.services| Inventory
+    Sales -->|inventory.services| Inventory
+
+    Accounts --> DB
+    Backend --> DB
+    Purchase --> DB
+    Sales --> DB
+    Inventory --> DB
+
+    Accounts --> Templates
+    Backend --> Templates
+    Frontend --> Templates
+    Purchase --> Templates
+    Sales --> Templates
+    Inventory --> Templates
+
+    Templates -->|HTML response| Browser
+    Browser -.->|GET static assets| CDN
+
+    classDef security fill:#4c1d3d,stroke:#fb7185,color:#fff
+    classDef backendApp fill:#064e3b,stroke:#34d399,color:#fff
+    classDef frontendApp fill:#083344,stroke:#22d3ee,color:#fff
+    classDef db fill:#4c1d95,stroke:#a78bfa,color:#fff
+    classDef ext fill:#78350f,stroke:#fbbf24,color:#fff
+    classDef generic fill:#1e293b,stroke:#94a3b8,color:#fff
+
+    class Accounts,Backend security
+    class Purchase,Sales,Inventory backendApp
+    class Frontend,Templates frontendApp
+    class DB db
+    class CDN ext
+    class Router,Core,MenuJSON generic

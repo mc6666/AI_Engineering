@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}提出申請{% endblock %}
+{% block breadcrumb %}提出申請{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">選擇簽核類別</h4>
+<div class="row g-3">
+  {% for wf in workflows %}
+  <div class="col-md-4">
+    <div class="card h-100 p-3">
+      <h6 class="fw-semibold">{{ wf.name }}</h6>
+      {% if wf.description %}<p class="text-muted small mb-2">{{ wf.description }}</p>{% endif %}
+      <div class="small text-muted mb-3">
+        <i class="bi bi-list-ol me-1"></i>共 {{ wf.steps.count }} 個審核關卡
+      </div>
+      {% if wf.steps.count %}
+      <div class="mb-3">
+        {% for step in wf.steps.all %}
+        <div class="d-flex align-items-center gap-1 small mb-1">
+          <span class="badge bg-light text-dark border">{{ step.step_number }}</span>
+          {{ step.name }}
+          {% if step.is_parallel %}<span class="badge bg-info text-white">並簽</span>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <a href="{% url 'apply_form' wf.pk %}" class="btn btn-primary btn-sm mt-auto">
+        <i class="bi bi-pencil-square me-1"></i>填寫申請
+      </a>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="alert alert-info">目前尚無可申請的簽核類別，請聯絡系統管理者。</div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

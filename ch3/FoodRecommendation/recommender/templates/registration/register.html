@@ -1,0 +1,38 @@
+{% extends "recommender/base.html" %}
+
+{% block title %}註冊 · 美食推薦{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-sm-10 col-md-6 col-lg-5">
+    <div class="card p-4 mt-3">
+      <h3 class="mb-4 text-center">建立帳號</h3>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">{{ field.label }}</label>
+            <input type="{{ field.field.widget.input_type }}"
+                   name="{{ field.html_name }}"
+                   class="form-control {% if field.errors %}is-invalid{% endif %}"
+                   {% if field.value %}value="{{ field.value }}"{% endif %}>
+            {% if field.help_text %}
+              <div class="form-text text-muted">{{ field.help_text }}</div>
+            {% endif %}
+            {% for err in field.errors %}
+              <div class="invalid-feedback">{{ err }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        <div class="d-grid mt-3">
+          <button type="submit" class="btn btn-danger">建立帳號</button>
+        </div>
+      </form>
+      <hr>
+      <p class="text-center mb-0 small">
+        已有帳號？<a href="{% url 'login' %}">前往登入</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

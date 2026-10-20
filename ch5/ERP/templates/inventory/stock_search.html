@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}庫存查詢{% endblock %}
+{% block page_title %}庫存查詢{% endblock %}
+{% block content %}
+<form method="get" class="row g-2 mb-3">
+<div class="col-auto"><select name="item" class="form-control"><option value="">全部商品</option>{% for i in items %}<option value="{{ i.pk }}" {% if request.GET.item == i.pk|stringformat:'s' %}selected{% endif %}>{{ i.item_code }} {{ i.item_name }}</option>{% endfor %}</select></div>
+<div class="col-auto"><select name="warehouse" class="form-control"><option value="">全部倉庫</option>{% for w in warehouses %}<option value="{{ w.pk }}" {% if request.GET.warehouse == w.pk|stringformat:'s' %}selected{% endif %}>{{ w.warehouse_id }} {{ w.warehouse_name }}</option>{% endfor %}</select></div>
+<div class="col-auto"><input type="text" name="barcode" class="form-control" placeholder="條碼" value="{{ request.GET.barcode }}"></div>
+<div class="col-auto"><input type="text" name="lot_number" class="form-control" placeholder="批號" value="{{ request.GET.lot_number }}"></div>
+<div class="col-auto"><input type="text" name="serial_no" class="form-control" placeholder="序號" value="{{ request.GET.serial_no }}"></div>
+<div class="col-auto"><input type="text" name="bin_code" class="form-control" placeholder="儲位" value="{{ request.GET.bin_code }}"></div>
+<div class="col-auto"><button class="btn btn-primary">查詢</button></div>
+</form>
+{% if results is not None %}
+<table class="table table-bordered">
+<thead><tr><th>商品</th><th>倉庫</th><th>現有庫存</th><th>可用庫存</th><th>已預留</th><th>在途</th><th>待出庫</th><th>平均成本</th><th>庫存價值</th></tr></thead>
+<tbody>
+{% for r in results %}
+<tr><td>{{ r.item }}</td><td>{{ r.warehouse }}</td><td>{{ r.on_hand }}</td><td>{{ r.available }}</td><td>{{ r.reserved }}</td><td>{{ r.in_transit }}</td><td>{{ r.pending_issue }}</td><td>{{ r.average_cost }}</td><td>{{ r.value }}</td></tr>
+{% empty %}<tr><td colspan="9">查無資料</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endif %}
+{% endblock %}

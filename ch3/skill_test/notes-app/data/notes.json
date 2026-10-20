@@ -1,0 +1,16 @@
+[
+  {
+    "id": "d1e2f3a4-b5c6-7890-abcd-ef1234567890",
+    "title": "Welcome to Notes",
+    "content": "This is your first note!\n\nYou can create, edit, and delete notes using this app.\n\nTry clicking 'New Note' to add another one.",
+    "createdAt": "2026-06-07T08:00:00.000Z",
+    "updatedAt": "2026-06-07T08:00:00.000Z"
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef0987654321",
+    "title": "Shopping List",
+    "content": "- Milk\n- Eggs\n- Bread\n- Coffee\n- Apples",
+    "createdAt": "2026-06-07T09:00:00.000Z",
+    "updatedAt": "2026-06-07T09:30:00.000Z"
+  }
+]

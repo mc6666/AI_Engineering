@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}角色管理{% endblock %}
+{% block page_title %}角色管理{% endblock %}
+{% block content %}
+<a href="{% url 'backend:role_add' %}" class="btn btn-primary mb-3">新增角色</a>
+<table class="table table-bordered">
+  <thead>
+    <tr><th>角色名稱</th><th>功能數</th><th>使用者數</th><th>操作</th></tr>
+  </thead>
+  <tbody>
+  {% for role in roles %}
+    <tr>
+      <td>{{ role.name }}</td>
+      <td>{{ role.functions.count }}</td>
+      <td>{{ role.users.count }}</td>
+      <td>
+        <a href="{% url 'backend:role_edit' role.pk %}" class="btn btn-sm btn-secondary">編輯</a>
+        <a href="{% url 'backend:role_assign_functions' role.pk %}" class="btn btn-sm btn-info">指派功能</a>
+        <a href="{% url 'backend:role_assign_users' role.pk %}" class="btn btn-sm btn-info">指派使用者</a>
+        <a href="{% url 'backend:role_delete' role.pk %}" class="btn btn-sm btn-danger">刪除</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="4">尚無角色資料</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

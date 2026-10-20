@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}匯入銷售訂單{% endblock %}
+{% block page_title %}匯入銷售訂單（CSV）{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">上傳並匯入</button></form>
+{% endblock %}

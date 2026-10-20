@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}案件詳情{% endblock %}
+{% block breadcrumb %}<a href="{% url 'my_cases' %}">我的案件</a> / #{{ case.pk }}{% endblock %}
+{% block content %}
+<div class="row g-3">
+<div class="col-md-8">
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-start mb-1">
+      <h5 class="fw-bold">{{ case.subject }}</h5>
+      <span class="badge badge-{{ case.status }} fs-6">{{ case.get_status_display }}</span>
+    </div>
+    <div class="text-muted small mb-3">
+      類別: {{ case.workflow.name }} | 申請時間: {{ case.created_at|date:"Y/m/d H:i" }} | 目前關卡: 第 {{ case.current_step }} 關
+    </div>
+    {% if case.body %}
+    <h6 class="fw-semibold">說明</h6>
+    <div class="border rounded p-3 bg-light mb-3"><pre class="mb-0" style="white-space:pre-wrap">{{ case.body }}</pre></div>
+    {% endif %}
+    {% if case.form_data %}
+    <h6 class="fw-semibold">表單資料</h6>
+    <table class="table table-sm table-bordered">
+      {% for key, val in case.form_data.items %}
+      <tr><th class="bg-light" style="width:30%">{{ key }}</th><td>{{ val }}</td></tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+    {% if case.status == 'pending' and case.created_by == request.user.employee %}
+    <a href="{% url 'withdraw_case' case.pk %}" class="btn btn-warning btn-sm mt-2">
+      <i class="bi bi-arrow-counterclockwise me-1"></i>撤回申請
+    </a>
+    {% endif %}
+  </div>
+</div>
+<div class="col-md-4">
+  <div class="card p-3">
+    <h6 class="fw-semibold mb-3">簽核歷程</h6>
+    {% if records %}
+    {% for rec in records %}
+    <div class="d-flex gap-2 mb-3">
+      <div class="flex-shrink-0">
+        {% if rec.action == 'approve' %}<i class="bi bi-check-circle-fill text-success fs-5"></i>
+        {% elif rec.action == 'reject' %}<i class="bi bi-x-circle-fill text-danger fs-5"></i>
+        {% else %}<i class="bi bi-clock-fill text-warning fs-5"></i>{% endif %}
+      </div>
+      <div>
+        <div class="fw-semibold small">第{{ rec.step_number }}關 {{ rec.step_name }}</div>
+        <div class="text-muted small">{{ rec.approver.name }}</div>
+        {% if rec.action_date %}<div class="text-muted small">{{ rec.action_date|date:"Y/m/d H:i" }}</div>{% endif %}
+        {% if rec.comment %}<div class="small mt-1 text-secondary border-start ps-2">{{ rec.comment }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="text-muted small">尚無簽核記錄</p>
+    {% endif %}
+  </div>
+</div>
+</div>
+{% endblock %}

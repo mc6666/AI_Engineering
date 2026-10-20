@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}銷售訂單查詢{% endblock %}
+{% block page_title %}銷售訂單查詢{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <a href="{% url 'sales:order_add' %}" class="btn btn-primary">新增銷售訂單</a>
+  <div>
+    <a href="{% url 'sales:export_csv' %}" class="btn btn-outline-secondary">匯出 CSV</a>
+    <a href="{% url 'sales:export_excel' %}" class="btn btn-outline-secondary">匯出 Excel</a>
+    <a href="{% url 'sales:export_pdf' %}" class="btn btn-outline-secondary" target="_blank">匯出 PDF（列印）</a>
+    <a href="{% url 'sales:import_csv' %}" class="btn btn-outline-secondary">匯入 CSV</a>
+  </div>
+</div>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-auto">{{ form.customer }}</div>
+  <div class="col-auto">{{ form.so_number }}</div>
+  <div class="col-auto">{{ form.status }}</div>
+  <div class="col-auto">{{ form.date_from }}</div>
+  <div class="col-auto">{{ form.date_to }}</div>
+  <div class="col-auto"><button class="btn btn-secondary">查詢</button></div>
+</form>
+<table class="table table-bordered">
+<thead><tr><th>訂單編號</th><th>客戶</th><th>訂單日期</th><th>狀態</th><th>總金額</th><th>業務人員</th><th>操作</th></tr></thead>
+<tbody>
+{% for order in orders %}
+<tr>
+<td><a href="{% url 'sales:order_detail' order.pk %}">{{ order.so_number }}</a></td>
+<td>{{ order.customer }}</td><td>{{ order.order_date }}</td><td>{{ order.get_status_display }}</td>
+<td>{{ order.total_amount }}</td><td>{{ order.salesperson }}</td>
+<td><a href="{% url 'sales:order_detail' order.pk %}" class="btn btn-sm btn-secondary">檢視</a></td>
+</tr>
+{% empty %}<tr><td colspan="7">查無訂單資料</td></tr>{% endfor %}
+</tbody>
+</table>
+{% if is_paginated %}
+<nav><ul class="pagination">
+{% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">上一頁</a></li>{% endif %}
+<li class="page-item disabled"><span class="page-link">第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 頁</span></li>
+{% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">下一頁</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

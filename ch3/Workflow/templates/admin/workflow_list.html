@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}簽核類別{% endblock %}
+{% block breadcrumb %}簽核類別制定{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0">簽核類別</h4>
+  <a href="{% url 'workflow_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>新增類別</a>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>#</th><th>名稱</th><th>說明</th><th>審核層級</th><th>步驟數</th><th>操作</th></tr>
+      </thead>
+      <tbody>
+        {% for wf in workflows %}
+        <tr>
+          <td>{{ wf.pk }}</td>
+          <td>{{ wf.name }}</td>
+          <td>{{ wf.description|default:"-"|truncatechars:40 }}</td>
+          <td>{{ wf.num_levels }}</td>
+          <td>{{ wf.steps.count }}</td>
+          <td>
+            <a href="{% url 'workflow_steps' wf.pk %}" class="btn btn-sm btn-outline-info" title="步驟設定"><i class="bi bi-list-ol"></i></a>
+            <a href="{% url 'form_design' wf.pk %}" class="btn btn-sm btn-outline-success" title="表單設計"><i class="bi bi-file-earmark-code"></i></a>
+            <a href="{% url 'workflow_edit' wf.pk %}" class="btn btn-sm btn-outline-primary" title="編輯"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'workflow_delete' wf.pk %}" class="btn btn-sm btn-outline-danger" title="刪除"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">尚無簽核類別</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

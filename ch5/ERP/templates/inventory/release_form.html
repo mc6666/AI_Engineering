@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}解除庫存預留{% endblock %}
+{% block page_title %}解除庫存預留{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">執行解除</button></form>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}新增銷售訂單{% endblock %}
+{% block page_title %}新增銷售訂單{% endblock %}
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+  <div class="card"><div class="card-header">訂單資訊</div><div class="card-body">{{ form.as_p }}</div></div>
+  <div class="card">
+    <div class="card-header">訂單明細</div>
+    <div class="card-body">
+      {{ formset.management_form }}
+      <table class="table">
+        <thead><tr><th>商品</th><th>倉庫</th><th>數量</th><th>單價</th><th>折扣</th><th>刪除</th></tr></thead>
+        <tbody>
+        {% for item_form in formset %}
+          <tr>
+            <td>{{ item_form.item }}</td>
+            <td>{{ item_form.warehouse }}</td>
+            <td>{{ item_form.quantity }}</td>
+            <td>{{ item_form.unit_price }}</td>
+            <td>{{ item_form.discount }}</td>
+            <td>{% if item_form.DELETE %}{{ item_form.DELETE }}{% endif %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">建立訂單</button>
+  <a href="{% url 'sales:order_list' %}" class="btn btn-secondary">取消</a>
+</form>
+{% endblock %}

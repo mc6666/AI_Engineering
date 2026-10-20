@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}商品主檔{% endblock %}
+{% block page_title %}商品主檔管理{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <form method="get" class="d-flex">
+    <input type="text" name="q" class="form-control me-2" placeholder="搜尋代號或名稱" value="{{ request.GET.q }}">
+    <button class="btn btn-secondary">搜尋</button>
+  </form>
+  <a href="{% url 'inventory:item_add' %}" class="btn btn-primary">新增商品</a>
+</div>
+<table class="table table-bordered">
+  <thead><tr><th>代號</th><th>名稱</th><th>分類</th><th>單位</th><th>批號/序號</th><th>再訂購點</th><th>啟用</th><th>操作</th></tr></thead>
+  <tbody>
+  {% for item in items %}
+    <tr>
+      <td><a href="{% url 'inventory:item_detail' item.pk %}">{{ item.item_code }}</a></td>
+      <td>{{ item.item_name }}</td>
+      <td>{{ item.category|default:'-' }}</td>
+      <td>{{ item.unit_of_measure }}</td>
+      <td>{% if item.track_lot %}批號{% endif %} {% if item.track_serial %}序號{% endif %}</td>
+      <td>{{ item.reorder_point }}</td>
+      <td>{% if item.is_active %}是{% else %}否{% endif %}</td>
+      <td>
+        <a href="{% url 'inventory:item_edit' item.pk %}" class="btn btn-sm btn-secondary">編輯</a>
+        <a href="{% url 'inventory:item_delete' item.pk %}" class="btn btn-sm btn-danger">刪除</a>
+      </td>
+    </tr>
+  {% empty %}<tr><td colspan="8">尚無商品資料</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% if is_paginated %}
+<nav>
+  <ul class="pagination">
+    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">上一頁</a></li>{% endif %}
+    <li class="page-item disabled"><span class="page-link">第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 頁</span></li>
+    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">下一頁</a></li>{% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

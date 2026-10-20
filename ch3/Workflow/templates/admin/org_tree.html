@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}樹狀組織表{% endblock %}
+{% block breadcrumb %}樹狀組織表{% endblock %}
+{% block extra_head %}
+<style>
+  #tree-editor { font-family: monospace; font-size: 0.85rem; }
+  .tree-node { padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+  .tree-node:hover { background: #f1f5f9; }
+  .tree-children { border-left: 2px solid #e2e8f0; margin-left: 16px; padding-left: 12px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0">樹狀組織表</h4>
+</div>
+
+<div class="row g-3">
+<div class="col-md-5">
+  <div class="card p-3">
+    <h6 class="fw-semibold mb-3">組織結構預覽</h6>
+    <div id="tree-view"></div>
+  </div>
+</div>
+
+<div class="col-md-7">
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-semibold mb-0">JSON 編輯器</h6>
+      <button type="button" class="btn btn-sm btn-outline-secondary" id="formatBtn">格式化</button>
+    </div>
+    <textarea id="tree-editor" class="form-control" rows="18">{{ tree_json }}</textarea>
+    <p class="text-muted small mt-2">
+      欄位: id、code (單位代碼)、name (名稱)、parent_code、manager_id (員工ID)、agent_id (代理人ID)、children (陣列)
+    </p>
+    <form method="post" action="{% url 'org_tree_save' %}" id="saveOrgForm">
+      {% csrf_token %}
+      <input type="hidden" name="tree_json" id="tree_json_input">
+      <button type="button" class="btn btn-primary mt-1" id="saveOrgBtn"><i class="bi bi-floppy me-1"></i>儲存</button>
+    </form>
+  </div>
+</div>
+
+<div class="col-12">
+  <div class="card p-3">
+    <h6 class="fw-semibold mb-2">員工列表 (供設定主管ID參考)</h6>
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0">
+        <thead class="table-light"><tr><th>ID</th><th>姓名</th><th>Email</th><th>部門代碼</th></tr></thead>
+        <tbody>
+          {% for emp in employees %}
+          <tr><td>{{ emp.pk }}</td><td>{{ emp.name }}</td><td>{{ emp.email }}</td><td>{{ emp.department_code|default:"-" }}</td></tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-muted text-center">尚無員工</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function renderTree(nodes, container) {
+  nodes.forEach(node => {
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="tree-node"><i class="bi bi-building me-1 text-primary"></i><strong>${node.name}</strong> <small class="text-muted">(${node.code})</small>${node.manager_id ? `<span class="badge bg-light text-dark ms-1">主管ID:${node.manager_id}</span>` : ''}</div>`;
+    if (node.children && node.children.length) {
+      const children = document.createElement('div');
+      children.className = 'tree-children';
+      renderTree(node.children, children);
+      div.appendChild(children);
+    }
+    container.appendChild(div);
+  });
+}
+
+function refreshTree() {
+  const container = document.getElementById('tree-view');
+  container.innerHTML = '';
+  try {
+    const data = JSON.parse(document.getElementById('tree-editor').value);
+    renderTree(data, container);
+  } catch (e) {
+    container.innerHTML = '<p class="text-danger small">JSON 格式錯誤</p>';
+  }
+}
+
+document.getElementById('formatBtn').addEventListener('click', () => {
+  try {
+    const data = JSON.parse(document.getElementById('tree-editor').value);
+    document.getElementById('tree-editor').value = JSON.stringify(data, null, 2);
+    refreshTree();
+  } catch(e) { alert('JSON 格式錯誤'); }
+});
+
+document.getElementById('saveOrgBtn').addEventListener('click', () => {
+  document.getElementById('tree_json_input').value = document.getElementById('tree-editor').value;
+  document.getElementById('saveOrgForm').submit();
+});
+
+document.getElementById('tree-editor').addEventListener('input', refreshTree);
+refreshTree();
+</script>
+{% endblock %}

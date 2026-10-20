@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}全面盤點單{% endblock %}
+{% block page_title %}全面盤點單：{{ physical_inventory.count_no }}{% endblock %}
+{% block content %}
+<p>倉庫：{{ physical_inventory.warehouse }}｜狀態：{{ physical_inventory.get_status_display }}</p>
+<form method="post">
+{% csrf_token %}
+<table class="table table-bordered">
+<thead><tr><th>商品</th><th>系統數量</th><th>實盤數量</th><th>盤差</th></tr></thead>
+<tbody>
+{% for line in lines %}
+<tr>
+<td>{{ line.item }}</td><td>{{ line.system_qty }}</td>
+<td><input type="number" step="0.01" name="qty_{{ line.pk }}" value="{{ line.counted_qty|default_if_none:'' }}" class="form-control" {% if physical_inventory.status == 'CLOSED' %}disabled{% endif %}></td>
+<td>{{ line.variance|default_if_none:'-' }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% if physical_inventory.status == 'FROZEN' or physical_inventory.status == 'PENDING_APPROVAL' %}
+<button type="submit" name="action" value="record" class="btn btn-primary">匯入盤點資料</button>
+{% endif %}
+{% if physical_inventory.status == 'PENDING_APPROVAL' %}
+<button type="submit" name="action" value="approve" class="btn btn-success">核准並自動調整庫存</button>
+{% endif %}
+</form>
+{% endblock %}

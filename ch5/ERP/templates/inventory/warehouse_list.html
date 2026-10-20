@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}倉庫管理{% endblock %}
+{% block page_title %}倉庫管理{% endblock %}
+{% block content %}
+<a href="{% url 'inventory:warehouse_add' %}" class="btn btn-primary mb-3">新增倉庫</a>
+<table class="table table-bordered">
+<thead><tr><th>代號</th><th>名稱</th><th>位置</th><th>啟用</th><th>盤點凍結</th><th>操作</th></tr></thead>
+<tbody>
+{% for w in warehouses %}
+<tr>
+<td><a href="{% url 'inventory:warehouse_detail' w.pk %}">{{ w.warehouse_id }}</a></td>
+<td>{{ w.warehouse_name }}</td><td>{{ w.location }}</td>
+<td>{% if w.is_active %}是{% else %}否{% endif %}</td>
+<td>{% if w.is_frozen %}凍結中{% else %}-{% endif %}</td>
+<td><a href="{% url 'inventory:warehouse_edit' w.pk %}" class="btn btn-sm btn-secondary">編輯</a> <a href="{% url 'inventory:warehouse_delete' w.pk %}" class="btn btn-sm btn-danger">刪除</a></td>
+</tr>
+{% empty %}<tr><td colspan="6">尚無倉庫資料</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

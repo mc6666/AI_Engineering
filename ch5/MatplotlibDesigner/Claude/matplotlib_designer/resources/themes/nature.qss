@@ -1,0 +1,7 @@
+/* Nature theme: warm, muted greens/earth tones matching the journal's figure style. */
+QWidget { background-color: #f6f5f0; color: #2a2a22; }
+QToolBar { background-color: #e6e3d8; border: none; spacing: 4px; }
+QStatusBar { background-color: #e6e3d8; }
+QTreeWidget, QScrollArea { background-color: #fbfaf6; }
+QTabWidget::pane { border: 1px solid #ada98e; }
+QPushButton { border: 1px solid #6f7a5c; }

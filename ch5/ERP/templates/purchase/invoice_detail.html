@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}供應商發票明細{% endblock %}
+{% block page_title %}供應商發票：{{ invoice.invoice_number }}{% endblock %}
+{% block content %}
+<p>採購單：<a href="{% url 'purchase:order_detail' invoice.purchase_order.pk %}">{{ invoice.purchase_order.po_number }}</a>｜發票日期：{{ invoice.invoice_date }}｜金額：{{ invoice.amount }}｜比對狀態：{{ invoice.get_match_status_display }}</p>
+
+<form method="post" action="{% url 'purchase:invoice_three_way_match' invoice.pk %}" class="mb-3">
+{% csrf_token %}<button class="btn btn-primary">執行三方比對（採購單／收貨單／發票）</button>
+</form>
+
+<div class="card">
+<div class="card-header">付款排程</div>
+<div class="card-body">
+<table class="table">
+<thead><tr><th>到期日</th><th>金額</th><th>提前付款折扣</th><th>狀態</th><th>操作</th></tr></thead>
+<tbody>
+{% for p in payment_schedules %}
+<tr><td>{{ p.due_date }}</td><td>{{ p.amount }}</td><td>{{ p.early_discount }}</td><td>{{ p.get_status_display }}</td>
+<td>{% if p.status == 'SCHEDULED' %}
+<form method="post" action="{% url 'purchase:payment_mark_paid' p.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-success">標記已付款</button></form>
+{% endif %}</td></tr>
+{% empty %}<tr><td colspan="5">尚無付款排程</td></tr>{% endfor %}
+</tbody>
+</table>
+{% if invoice.match_status == 'MATCHED' %}
+<form method="post" action="{% url 'purchase:invoice_schedule_payment' invoice.pk %}" class="row g-2">
+{% csrf_token %}
+<div class="col-auto">{{ payment_form.due_date }}</div>
+<div class="col-auto">{{ payment_form.early_discount }}</div>
+<div class="col-auto"><button class="btn btn-primary">安排付款</button></div>
+</form>
+{% else %}
+<p class="text-muted">發票須先完成三方比對一致（Match）後才能安排付款。</p>
+{% endif %}
+</div>
+</div>
+{% endblock %}

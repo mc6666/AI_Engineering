@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}採購訂單明細{% endblock %}
+{% block page_title %}採購訂單：{{ po.po_number }}{% endblock %}
+{% block content %}
+<p>
+供應商：{{ po.supplier }}｜訂單日期：{{ po.order_date }}｜需求交貨日：{{ po.required_date|default:'-' }}｜
+採購人員：{{ po.buyer }}｜付款條件：{{ po.payment_terms|default:'-' }}｜狀態：<strong>{{ po.get_status_display }}</strong>
+</p>
+<p>訂單總金額：{{ po.total_amount }}（核准門檻：{{ approval_threshold }}）</p>
+<p>
+供應商確認：{% if track.supplier_confirmed %}已確認{% else %}尚未確認{% endif %}｜
+預計到貨日：{{ po.expected_arrival_date|default:'-' }}
+{% if track.is_delayed %}<span class="badge text-bg-danger">延遲交貨</span>{% endif %}
+</p>
+
+<div class="card">
+<div class="card-header">商品明細</div>
+<div class="card-body">
+<table class="table">
+<thead><tr><th>商品</th><th>說明</th><th>數量</th><th>單價</th><th>折扣</th><th>收貨倉庫</th><th>已收貨</th><th>未收貨</th></tr></thead>
+<tbody>
+{% for line in lines %}
+<tr><td>{{ line.item }}</td><td>{{ line.description }}</td><td>{{ line.quantity }}</td><td>{{ line.unit_price }}</td><td>{{ line.discount }}</td><td>{{ line.warehouse }}</td><td>{{ line.received_qty }}</td><td>{{ line.remaining_qty }}</td></tr>
+{% empty %}<tr><td colspan="8">尚無商品明細</td></tr>{% endfor %}
+</tbody>
+</table>
+{% if po.status == 'DRAFT' %}
+<form method="post" action="{% url 'purchase:order_add_line' po.pk %}" class="row g-2">
+{% csrf_token %}
+<div class="col-auto">{{ line_form.item }}</div>
+<div class="col-auto">{{ line_form.description }}</div>
+<div class="col-auto">{{ line_form.quantity }}</div>
+<div class="col-auto">{{ line_form.unit_price }}</div>
+<div class="col-auto">{{ line_form.discount }}</div>
+<div class="col-auto">{{ line_form.warehouse }}</div>
+<div class="col-auto"><button class="btn btn-primary">新增明細</button></div>
+</form>
+{% endif %}
+</div>
+</div>
+
+<div class="mb-3">
+{% if po.status == 'DRAFT' %}
+<form method="post" action="{% url 'purchase:order_submit' po.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-primary">送出審核</button></form>
+{% endif %}
+{% if po.status == 'SUBMITTED' %}
+<form method="post" action="{% url 'purchase:order_approve' po.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-success">核准</button></form>
+{% endif %}
+{% if po.status == 'APPROVED' %}
+<form method="post" action="{% url 'purchase:order_send' po.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-primary">發送給供應商</button></form>
+<form method="post" action="{% url 'purchase:order_confirm_supplier' po.pk %}" class="d-inline row g-2">
+  {% csrf_token %}
+  <div class="col-auto">{{ confirm_form.expected_arrival_date }}</div>
+  <div class="col-auto"><button class="btn btn-outline-primary">記錄供應商確認</button></div>
+</form>
+{% endif %}
+{% if po.status == 'SENT' %}
+<form method="post" action="{% url 'purchase:order_confirm_supplier' po.pk %}" class="d-inline row g-2">
+  {% csrf_token %}
+  <div class="col-auto">{{ confirm_form.expected_arrival_date }}</div>
+  <div class="col-auto"><button class="btn btn-outline-primary">記錄供應商確認</button></div>
+</form>
+{% endif %}
+{% if po.status == 'APPROVED' or po.status == 'SENT' or po.status == 'PARTIALLY_RECEIVED' %}
+<a href="{% url 'purchase:order_receive' po.pk %}" class="btn btn-primary">收貨</a>
+{% endif %}
+{% if po.status == 'RECEIVED' or po.status == 'PARTIALLY_RECEIVED' %}
+<a href="{% url 'purchase:order_invoice_add' po.pk %}" class="btn btn-outline-primary">登錄供應商發票</a>
+{% endif %}
+{% if po.status == 'DRAFT' or po.status == 'SUBMITTED' or po.status == 'APPROVED' %}
+<form method="post" action="{% url 'purchase:order_cancel' po.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-danger">取消訂單</button></form>
+{% endif %}
+{% if po.status == 'INVOICED' %}
+<form method="post" action="{% url 'purchase:order_close' po.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-success">結案</button></form>
+{% endif %}
+</div>
+
+<div class="card">
+<div class="card-header">收貨紀錄</div>
+<div class="card-body p-0">
+<table class="table mb-0">
+<thead><tr><th>收貨單號</th><th>倉庫</th><th>收貨日期</th><th>操作</th></tr></thead>
+<tbody>
+{% for grn in goods_receipts %}
+<tr><td>{{ grn.grn_number }}</td><td>{{ grn.warehouse }}</td><td>{{ grn.received_date }}</td>
+<td><a href="{% url 'purchase:goods_receipt_detail' grn.pk %}" class="btn btn-sm btn-secondary">檢視</a></td></tr>
+{% empty %}<tr><td colspan="4">尚無收貨紀錄</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">供應商發票</div>
+<div class="card-body p-0">
+<table class="table mb-0">
+<thead><tr><th>發票號碼</th><th>發票日期</th><th>金額</th><th>比對狀態</th><th>操作</th></tr></thead>
+<tbody>
+{% for inv in invoices %}
+<tr><td>{{ inv.invoice_number }}</td><td>{{ inv.invoice_date }}</td><td>{{ inv.amount }}</td><td>{{ inv.get_match_status_display }}</td>
+<td><a href="{% url 'purchase:invoice_detail' inv.pk %}" class="btn btn-sm btn-secondary">檢視</a></td></tr>
+{% empty %}<tr><td colspan="5">尚無發票資料</td></tr>{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+{% endblock %}

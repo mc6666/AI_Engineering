@@ -1,0 +1,4 @@
+interface:
+  display_name: "Calculator"
+  short_description: "Evaluate arithmetic with Python"
+  default_prompt: "Use $calculator to compute, simplify, or verify arithmetic expressions with Python."

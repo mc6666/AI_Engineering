@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>銷售訂單清單（列印 / PDF）</title>
+<style>
+body { font-family: sans-serif; margin: 2em; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #999; padding: 6px 10px; text-align: left; }
+@media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+<button class="no-print" onclick="window.print()">列印 / 另存為 PDF</button>
+<h2>銷售訂單清單</h2>
+<table>
+<thead><tr><th>訂單編號</th><th>客戶</th><th>訂單日期</th><th>狀態</th><th>總金額</th><th>業務人員</th></tr></thead>
+<tbody>
+{% for order in orders %}
+<tr><td>{{ order.so_number }}</td><td>{{ order.customer }}</td><td>{{ order.order_date }}</td><td>{{ order.get_status_display }}</td><td>{{ order.total_amount }}</td><td>{{ order.salesperson }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</body>
+</html>

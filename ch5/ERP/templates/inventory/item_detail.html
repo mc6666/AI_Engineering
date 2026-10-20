@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}{{ item.item_name }}{% endblock %}
+{% block page_title %}商品明細：{{ item.item_code }} {{ item.item_name }}{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <p>分類：{{ item.category|default:'-' }}｜單位：{{ item.unit_of_measure }}｜成本法：{{ item.get_costing_method_display }}</p>
+    <p>平均成本：{{ item.average_cost }}｜標準成本：{{ item.standard_cost }}</p>
+    <p>再訂購點：{{ item.reorder_point }}｜安全庫存：{{ item.safety_stock }}｜前置時間：{{ item.lead_time_days }} 天</p>
+    <p>
+      條碼：{{ item.barcode|default:'尚未產生' }}
+      <form method="post" action="{% url 'inventory:item_generate_barcode' item.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-outline-primary">產生條碼</button>
+      </form>
+    </p>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">各倉庫庫存</div>
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>倉庫</th><th>現有庫存</th><th>可用庫存</th><th>已預留</th><th>在途</th></tr></thead>
+      <tbody>
+      {% for s in stock_levels %}
+        <tr><td>{{ s.warehouse }}</td><td>{{ s.on_hand }}</td><td>{{ s.available }}</td><td>{{ s.reserved }}</td><td>{{ s.in_transit }}</td></tr>
+      {% empty %}<tr><td colspan="5">尚無庫存紀錄</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% if item.track_lot %}
+<div class="card">
+  <div class="card-header">批號</div>
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>批號</th><th>製造日期</th><th>到期日</th><th>供應商</th><th>數量</th></tr></thead>
+      <tbody>
+      {% for lot in lots %}
+        <tr class="{% if lot.is_expired %}table-danger{% endif %}"><td>{{ lot.lot_number }}</td><td>{{ lot.manufacture_date|default:'-' }}</td><td>{{ lot.expiry_date|default:'-' }}</td><td>{{ lot.supplier_name }}</td><td>{{ lot.quantity }}</td></tr>
+      {% empty %}<tr><td colspan="5">尚無批號資料</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% if item.track_serial %}
+<div class="card">
+  <div class="card-header">序號</div>
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>序號</th><th>狀態</th><th>倉庫</th><th>保固到期</th></tr></thead>
+      <tbody>
+      {% for s in serial_numbers %}
+        <tr><td>{{ s.serial_no }}</td><td>{{ s.get_status_display }}</td><td>{{ s.warehouse|default:'-' }}</td><td>{{ s.warranty_expiry|default:'-' }}</td></tr>
+      {% empty %}<tr><td colspan="4">尚無序號資料</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}庫存儀表板{% endblock %}
+{% block page_title %}庫存儀表板 Inventory Dashboard{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-3">
+    <div class="small-box bg-info">
+      <div class="inner"><h3>{{ dashboard.total_inventory_value|floatformat:0 }}</h3><p>總庫存價值</p></div>
+      <div class="icon"><i class="bi bi-currency-dollar"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-danger">
+      <div class="inner"><h3>{{ dashboard.out_of_stock_count }}</h3><p>缺貨商品</p></div>
+      <div class="icon"><i class="bi bi-exclamation-triangle"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-warning">
+      <div class="inner"><h3>{{ dashboard.overstock_count }}</h3><p>超量庫存</p></div>
+      <div class="icon"><i class="bi bi-box-seam"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-secondary">
+      <div class="inner"><h3>{{ dashboard.turnover_rate|floatformat:2 }}</h3><p>庫存週轉率（90天）</p></div>
+      <div class="icon"><i class="bi bi-arrow-repeat"></i></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">暢銷商品（近90天出庫量前10）</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>商品代號</th><th>商品名稱</th><th>出庫量</th></tr></thead>
+          <tbody>
+          {% for row in dashboard.best_sellers %}
+            <tr><td>{{ row.item__item_code }}</td><td>{{ row.item__item_name }}</td><td>{{ row.total_qty }}</td></tr>
+          {% empty %}<tr><td colspan="3">尚無資料</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">滯銷商品（近90天出庫量最低前10）</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>商品代號</th><th>商品名稱</th><th>出庫量</th></tr></thead>
+          <tbody>
+          {% for row in dashboard.slow_movers %}
+            <tr><td>{{ row.item__item_code }}</td><td>{{ row.item__item_name }}</td><td>{{ row.total_qty }}</td></tr>
+          {% empty %}<tr><td colspan="3">尚無資料</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">缺貨商品（可用庫存 &le; 0）</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>商品</th><th>倉庫</th><th>可用庫存</th></tr></thead>
+          <tbody>
+          {% for s in dashboard.out_of_stock_items %}
+            <tr><td>{{ s.item }}</td><td>{{ s.warehouse }}</td><td>{{ s.available }}</td></tr>
+          {% empty %}<tr><td colspan="3">無缺貨商品</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">呆滯庫存（180天內無出庫）</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>商品</th><th>倉庫</th><th>現有庫存</th></tr></thead>
+          <tbody>
+          {% for s in dashboard.dead_stock %}
+            <tr><td>{{ s.item }}</td><td>{{ s.warehouse }}</td><td>{{ s.on_hand }}</td></tr>
+          {% empty %}<tr><td colspan="3">無呆滯庫存</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

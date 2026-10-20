@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}開始全面盤點{% endblock %}
+{% block page_title %}開始全面盤點{% endblock %}
+{% block content %}
+<form method="post">
+{% csrf_token %}
+<div class="mb-3">
+<label class="form-label">選擇倉庫（開始盤點後將凍結該倉庫的庫存交易）</label>
+<select name="warehouse" class="form-control" required>
+{% for w in warehouses %}<option value="{{ w.pk }}">{{ w.warehouse_id }} {{ w.warehouse_name }}</option>{% endfor %}
+</select>
+</div>
+<button class="btn btn-primary">開始盤點（凍結倉庫）</button>
+</form>
+{% endblock %}

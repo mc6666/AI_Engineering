@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}請購單明細{% endblock %}
+{% block page_title %}請購單：{{ requisition.pr_number }}{% endblock %}
+{% block content %}
+<p>申請人：{{ requisition.applicant }}｜部門：{{ requisition.department }}｜預算代碼：{{ requisition.budget_code }}｜需求日期：{{ requisition.required_date|default:'-' }}｜狀態：{{ requisition.get_status_display }}</p>
+<p>採購原因：{{ requisition.reason|default:'-' }}</p>
+
+<div class="card">
+<div class="card-header">商品明細</div>
+<div class="card-body">
+<table class="table">
+<thead><tr><th>商品</th><th>數量</th></tr></thead>
+<tbody>
+{% for line in lines %}
+<tr><td>{{ line.item }}</td><td>{{ line.quantity }}</td></tr>
+{% empty %}<tr><td colspan="2">尚無商品明細</td></tr>{% endfor %}
+</tbody>
+</table>
+{% if requisition.status == 'DRAFT' %}
+<form method="post" action="{% url 'purchase:requisition_add_line' requisition.pk %}" class="row g-2">
+{% csrf_token %}
+<div class="col-auto">{{ line_form.item }}</div>
+<div class="col-auto">{{ line_form.quantity }}</div>
+<div class="col-auto"><button class="btn btn-primary">新增商品</button></div>
+</form>
+{% endif %}
+</div>
+</div>
+
+{% if requisition.status == 'DRAFT' %}
+<form method="post" action="{% url 'purchase:requisition_approve' requisition.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-success">核准</button></form>
+<form method="post" action="{% url 'purchase:requisition_reject' requisition.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-danger">駁回</button></form>
+{% endif %}
+{% if requisition.status == 'APPROVED' %}
+<a href="{% url 'purchase:rfq_add' %}" class="btn btn-outline-primary">建立詢價單（RFQ）</a>
+<a href="{% url 'purchase:order_add' %}" class="btn btn-outline-primary">建立採購訂單</a>
+{% endif %}
+{% endblock %}

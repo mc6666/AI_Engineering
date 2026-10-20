@@ -1,0 +1,5 @@
+generate calculator with python
+* with Keyboard support — numbers, +, -, *, /, Enter, Backspace, Esc
+* Color-coded keys — blue background for operators, red background for clear/delete, green background for =
+* No live preview at all until = is hit
+* use Bright mode for UI 

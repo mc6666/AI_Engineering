@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}庫存調整申請{% endblock %}
+{% block page_title %}庫存調整申請{% endblock %}
+{% block content %}
+<a href="{% url 'inventory:adjustment_add' %}" class="btn btn-primary mb-3">提出調整申請</a>
+<table class="table table-bordered">
+<thead><tr><th>商品</th><th>倉庫</th><th>調整數量</th><th>原因</th><th>申請人</th><th>狀態</th><th>操作</th></tr></thead>
+<tbody>
+{% for a in adjustments %}
+<tr>
+<td>{{ a.item }}</td><td>{{ a.warehouse }}</td><td>{{ a.quantity_delta }}</td><td>{{ a.reason }}</td><td>{{ a.requested_by }}</td>
+<td>{{ a.get_status_display }}</td>
+<td>
+{% if a.status == 'PENDING' %}
+<form method="post" action="{% url 'inventory:adjustment_approve' a.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-success">核准</button></form>
+<form method="post" action="{% url 'inventory:adjustment_reject' a.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm btn-danger">駁回</button></form>
+{% endif %}
+</td>
+</tr>
+{% empty %}<tr><td colspan="7">尚無調整申請</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}後台管理首頁{% endblock %}
+{% block page_title %}權限管理總覽{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">角色管理</div>
+      <div class="card-body">
+        <a href="{% url 'backend:role_list' %}" class="btn btn-primary">前往角色管理</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">功能管理</div>
+      <div class="card-body">
+        <a href="{% url 'backend:function_list' %}" class="btn btn-primary">前往功能管理</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}效期管理{% endblock %}
+{% block page_title %}效期管理{% endblock %}
+{% block content %}
+<div class="card"><div class="card-header text-bg-danger">已過期商品</div><div class="card-body p-0">
+<table class="table mb-0"><thead><tr><th>商品</th><th>批號</th><th>到期日</th><th>數量</th></tr></thead>
+<tbody>{% for lot in expired %}<tr><td>{{ lot.item }}</td><td>{{ lot.lot_number }}</td><td>{{ lot.expiry_date }}</td><td>{{ lot.quantity }}</td></tr>{% empty %}<tr><td colspan="4">無已過期商品</td></tr>{% endfor %}</tbody>
+</table></div></div>
+<div class="card"><div class="card-header text-bg-warning">即將過期商品（30天內）</div><div class="card-body p-0">
+<table class="table mb-0"><thead><tr><th>商品</th><th>批號</th><th>到期日</th><th>數量</th></tr></thead>
+<tbody>{% for lot in expiring %}<tr><td>{{ lot.item }}</td><td>{{ lot.lot_number }}</td><td>{{ lot.expiry_date }}</td><td>{{ lot.quantity }}</td></tr>{% empty %}<tr><td colspan="4">無即將過期商品</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

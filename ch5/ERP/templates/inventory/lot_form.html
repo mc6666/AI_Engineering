@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}批號設定{% endblock %}
+{% block page_title %}批號設定{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">儲存</button> <a href="{% url 'inventory:lot_list' %}" class="btn btn-secondary">取消</a></form>
+{% endblock %}

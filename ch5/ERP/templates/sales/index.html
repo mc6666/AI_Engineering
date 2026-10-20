@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}銷售儀表板{% endblock %}
+{% block page_title %}銷售儀表板 Sales Dashboard{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-3">
+    <div class="small-box bg-info">
+      <div class="inner"><h3>{{ dashboard.todays_order_count }}</h3><p>今日訂單數</p></div>
+      <div class="icon"><i class="bi bi-calendar-day"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-success">
+      <div class="inner"><h3>{{ dashboard.monthly_sales|floatformat:0 }}</h3><p>本月銷售額</p></div>
+      <div class="icon"><i class="bi bi-currency-dollar"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-warning">
+      <div class="inner"><h3>{{ dashboard.pending_shipment_count }}</h3><p>待出貨訂單</p></div>
+      <div class="icon"><i class="bi bi-truck"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-secondary">
+      <div class="inner"><h3>{{ dashboard.pending_invoice_count }}</h3><p>待開發票</p></div>
+      <div class="icon"><i class="bi bi-receipt"></i></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-3">
+    <div class="small-box bg-danger">
+      <div class="inner"><h3>{{ dashboard.cancelled_today_count }}</h3><p>今日取消訂單</p></div>
+      <div class="icon"><i class="bi bi-x-circle"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-primary">
+      <div class="inner"><h3>{{ dashboard.total_revenue|floatformat:0 }}</h3><p>總營收（本月）</p></div>
+      <div class="icon"><i class="bi bi-graph-up"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-info">
+      <div class="inner"><h3>{{ dashboard.avg_order_amount|floatformat:0 }}</h3><p>平均訂單金額</p></div>
+      <div class="icon"><i class="bi bi-calculator"></i></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">前十大客戶</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>客戶代號</th><th>客戶名稱</th><th>累計金額</th></tr></thead>
+          <tbody>
+          {% for row in dashboard.top_customers %}
+            <tr><td>{{ row.customer__customer_code }}</td><td>{{ row.customer__customer_name }}</td><td>{{ row.total }}</td></tr>
+          {% empty %}<tr><td colspan="3">尚無資料</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">暢銷商品</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>商品代號</th><th>商品名稱</th><th>累計數量</th></tr></thead>
+          <tbody>
+          {% for row in dashboard.best_sellers %}
+            <tr><td>{{ row.item__item_code }}</td><td>{{ row.item__item_name }}</td><td>{{ row.qty }}</td></tr>
+          {% empty %}<tr><td colspan="3">尚無資料</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

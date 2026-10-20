@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}提出庫存調整申請{% endblock %}
+{% block page_title %}提出庫存調整申請{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">送出申請</button></form>
+{% endblock %}

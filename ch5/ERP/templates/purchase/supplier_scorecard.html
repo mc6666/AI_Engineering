@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}供應商績效評分卡{% endblock %}
+{% block page_title %}供應商績效評分卡{% endblock %}
+{% block content %}
+<form method="get" class="row g-2 mb-3">
+<div class="col-auto">{{ form.supplier }}</div>
+<div class="col-auto"><button class="btn btn-primary">產生評分卡</button></div>
+</form>
+{% if scorecard %}
+<div class="card">
+<div class="card-header">{{ scorecard.supplier }}</div>
+<div class="card-body">
+<table class="table">
+<tr><th>累計採購單數</th><td>{{ scorecard.total_pos }}</td></tr>
+<tr><th>準時交貨率</th><td>{{ scorecard.on_time_delivery_rate|floatformat:1 }}%</td></tr>
+<tr><th>品質合格率</th><td>{{ scorecard.quality_pass_rate|floatformat:1 }}%</td></tr>
+<tr><th>平均交期（天）</th><td>{{ scorecard.avg_lead_time_days|floatformat:1 }}</td></tr>
+<tr><th>累計採購金額</th><td>{{ scorecard.total_purchase_amount }}</td></tr>
+<tr><th>退貨率</th><td>{{ scorecard.return_rate|floatformat:1 }}%</td></tr>
+</table>
+</div>
+</div>
+{% endif %}
+{% endblock %}

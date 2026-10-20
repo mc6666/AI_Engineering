@@ -1,0 +1,8 @@
+flowchart TD
+    Start([Start]) --> Input["Input a number X"]
+    Input --> Compute["b = x ** 2"]
+    Compute --> Decision{"b > 100?"}
+    Decision -->|Yes| Good["Print: Good !"]
+    Decision -->|No| Bad["Print: Bad !"]
+    Good --> End([End])
+    Bad --> End

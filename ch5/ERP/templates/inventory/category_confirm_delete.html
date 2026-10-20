@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}刪除分類{% endblock %}
+{% block page_title %}刪除分類{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}<p>確定要刪除分類「{{ object.name }}」嗎？</p><button class="btn btn-danger">確定刪除</button> <a href="{% url 'inventory:category_list' %}" class="btn btn-secondary">取消</a></form>
+{% endblock %}

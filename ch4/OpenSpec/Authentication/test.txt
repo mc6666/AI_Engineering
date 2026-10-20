@@ -1,0 +1,11 @@
+註冊帳號：
+curl -H "Content-Type: application/json" -d "{\"username\": \"john\", \"password\": \"1234\"}" http://127.0.0.1:5000/register
+
+登入：
+curl -H "Content-Type: application/json" -d "{\"username\": \"john\", \"password\": \"1234\"}" http://127.0.0.1:5000/login
+
+protected：
+curl -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJleHAiOjE3ODE5NzExNzJ9.Yl1x7m41kCBv2jmQ-msbzro0ra4iKxGJf2qddWroFKg"  -d "{\"username\": \"john\"}" http://127.0.0.1:5000/protected
+
+登出：
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJleHAiOjE3ODE5NzExNzJ9.Yl1x7m41kCBv2jmQ-msbzro0ra4iKxGJf2qddWroFKg"  -d "{\"username\": \"john\"}" http://127.0.0.1:5000/logout

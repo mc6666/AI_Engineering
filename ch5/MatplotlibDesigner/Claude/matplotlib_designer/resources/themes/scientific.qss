@@ -1,0 +1,7 @@
+/* Scientific theme: crisp white workspace, blue accent, for publication figures. */
+QWidget { background-color: #ffffff; color: #101010; }
+QToolBar { background-color: #eef2f7; border: none; spacing: 4px; }
+QStatusBar { background-color: #eef2f7; }
+QTreeWidget, QScrollArea { background-color: #ffffff; }
+QTabWidget::pane { border: 1px solid #b9c6d6; }
+QPushButton { border: 1px solid #6d8fb5; }

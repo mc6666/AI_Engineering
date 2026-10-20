@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}詢價單{% endblock %}
+{% block page_title %}詢價單 RFQ{% endblock %}
+{% block content %}
+<a href="{% url 'purchase:rfq_add' %}" class="btn btn-primary mb-3">建立詢價單</a>
+<table class="table table-bordered">
+<thead><tr><th>詢價單號</th><th>報價截止日</th><th>狀態</th><th>操作</th></tr></thead>
+<tbody>
+{% for rfq in rfqs %}
+<tr>
+<td><a href="{% url 'purchase:rfq_detail' rfq.pk %}">{{ rfq.rfq_number }}</a></td>
+<td>{{ rfq.quote_deadline|default:'-' }}</td><td>{{ rfq.get_status_display }}</td>
+<td><a href="{% url 'purchase:rfq_detail' rfq.pk %}" class="btn btn-sm btn-secondary">檢視</a></td>
+</tr>
+{% empty %}<tr><td colspan="4">尚無詢價單</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

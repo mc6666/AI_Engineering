@@ -1,0 +1,4 @@
+測試帳號
+- 管理者: admin / admin1234
+- 員工: user1 / user1234
+- 主管: manager1 / 1234

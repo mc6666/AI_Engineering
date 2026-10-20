@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}我的案件{% endblock %}
+{% block breadcrumb %}我的案件{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="fw-bold mb-0">我的案件</h4>
+  <a href="{% url 'apply_select' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>新申請</a>
+</div>
+
+<div class="card p-2 mb-3">
+  <form method="get" class="d-flex gap-2 align-items-center">
+    <select name="status" class="form-select form-select-sm" style="width:160px">
+      <option value="">全部狀態</option>
+      {% for val, label in status_choices %}
+      <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm">篩選</button>
+    {% if status_filter %}<a href="{% url 'my_cases' %}" class="btn btn-outline-secondary btn-sm">重置</a>{% endif %}
+  </form>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>#</th><th>主旨</th><th>類別</th><th>目前關卡</th><th>狀態</th><th>申請時間</th><th>操作</th></tr>
+      </thead>
+      <tbody>
+        {% for case in cases %}
+        <tr>
+          <td>{{ case.pk }}</td>
+          <td>{{ case.subject|truncatechars:35 }}</td>
+          <td>{{ case.workflow.name }}</td>
+          <td>第 {{ case.current_step }} 關</td>
+          <td><span class="badge badge-{{ case.status }}">{{ case.get_status_display }}</span></td>
+          <td>{{ case.created_at|date:"Y/m/d H:i" }}</td>
+          <td>
+            <a href="{% url 'case_detail' case.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+            {% if case.status == 'pending' %}
+            <a href="{% url 'withdraw_case' case.pk %}" class="btn btn-sm btn-outline-warning"><i class="bi bi-arrow-counterclockwise"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">尚無案件</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

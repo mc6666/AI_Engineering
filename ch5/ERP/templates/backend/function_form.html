@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}功能設定{% endblock %}
+{% block page_title %}功能設定{% endblock %}
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">儲存</button>
+  <a href="{% url 'backend:function_list' %}" class="btn btn-secondary">取消</a>
+</form>
+{% endblock %}

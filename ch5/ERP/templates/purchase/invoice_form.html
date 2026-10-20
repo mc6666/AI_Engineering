@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}登錄供應商發票{% endblock %}
+{% block page_title %}登錄供應商發票：{{ po.po_number }}{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">建立</button></form>
+{% endblock %}

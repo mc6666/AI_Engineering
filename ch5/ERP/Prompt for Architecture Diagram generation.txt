@@ -1,0 +1,1 @@
+Analyze this codebase and describe the architecture. Include all major components, how they connect, what technologies they use, and any cloud services or integrations. Format as a list for an architecture diagram.

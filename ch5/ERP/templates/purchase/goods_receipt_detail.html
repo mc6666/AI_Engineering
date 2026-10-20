@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}收貨單明細{% endblock %}
+{% block page_title %}收貨單：{{ goods_receipt.grn_number }}{% endblock %}
+{% block content %}
+<p>採購單：<a href="{% url 'purchase:order_detail' goods_receipt.purchase_order.pk %}">{{ goods_receipt.purchase_order.po_number }}</a>｜倉庫：{{ goods_receipt.warehouse }}｜收貨日期：{{ goods_receipt.received_date }}</p>
+<table class="table table-bordered">
+<thead><tr><th>商品</th><th>收貨數量</th><th>品質驗收結果</th><th>操作</th></tr></thead>
+<tbody>
+{% for line in lines %}
+<tr>
+<td>{{ line.po_item.item }}</td><td>{{ line.received_qty }}</td><td>{{ line.get_quality_result_display }}</td>
+<td>
+{% if line.quality_result == 'PENDING' %}
+<form method="post" action="{% url 'purchase:goods_receipt_line_inspect' line.pk %}" class="d-inline">
+  {% csrf_token %}<input type="hidden" name="result" value="PASS"><button class="btn btn-sm btn-success">合格</button>
+</form>
+<form method="post" action="{% url 'purchase:goods_receipt_line_inspect' line.pk %}" class="d-inline">
+  {% csrf_token %}<input type="hidden" name="result" value="FAIL"><button class="btn btn-sm btn-danger">不合格</button>
+</form>
+{% endif %}
+{% if line.quality_result == 'FAIL' %}
+<form method="post" action="{% url 'purchase:goods_receipt_line_return' line.pk %}" class="d-inline row g-1">
+  {% csrf_token %}
+  <div class="col-auto">{{ return_form.reason }}</div>
+  <div class="col-auto">{{ return_form.quantity }}</div>
+  <div class="col-auto"><button class="btn btn-sm btn-warning">建立退貨單</button></div>
+</form>
+{% endif %}
+</td>
+</tr>
+{% empty %}<tr><td colspan="4">此收貨單無明細</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

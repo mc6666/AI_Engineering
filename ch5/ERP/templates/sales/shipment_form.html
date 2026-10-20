@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}建立出貨{% endblock %}
+{% block page_title %}建立出貨：{{ order.so_number }}{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">確認出貨</button> <a href="{% url 'sales:order_detail' order.pk %}" class="btn btn-secondary">取消</a></form>
+{% endblock %}

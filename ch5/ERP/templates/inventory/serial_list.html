@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}序號管理{% endblock %}
+{% block page_title %}序號管理{% endblock %}
+{% block content %}
+<a href="{% url 'inventory:serial_add' %}" class="btn btn-primary mb-3">新增序號</a>
+<table class="table table-bordered">
+<thead><tr><th>商品</th><th>序號</th><th>狀態</th><th>倉庫</th><th>保固到期</th><th>操作</th></tr></thead>
+<tbody>
+{% for s in serial_numbers %}
+<tr><td>{{ s.item }}</td><td>{{ s.serial_no }}</td><td>{{ s.get_status_display }}</td><td>{{ s.warehouse|default:'-' }}</td><td>{{ s.warranty_expiry|default:'-' }}</td>
+<td><a href="{% url 'inventory:serial_edit' s.pk %}" class="btn btn-sm btn-secondary">編輯</a></td></tr>
+{% empty %}<tr><td colspan="6">尚無序號資料</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <audio controls></audio>
+        <button id="play">
+            Play
+        </button>
+    </body>
+
+    <script>       
+        const playButton = document.getElementById("play");
+        playButton.onclick = (async () => {
+            const audio = document.querySelector("audio");
+            audio.srcObject = await navigator.mediaDevices.getUserMedia({audio: true, video: false});
+            audio.play();
+        });
+
+    </script>
+</html>

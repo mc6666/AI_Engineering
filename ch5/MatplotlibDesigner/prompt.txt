@@ -1,0 +1,5 @@
+prompt 1：
+generate a matplotlib designer with GUI. the designer provide toolbar to add title, x/y label and tick, annotation, arrow with text, multi plot in a figure.
+
+prompt 2：
+generate Matplotlib Designer v2 app

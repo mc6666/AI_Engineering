@@ -1,0 +1,57 @@
+{% extends "recommender/base.html" %}
+
+{% block title %}查詢記錄 · 美食推薦{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0">📋 本次查詢記錄</h2>
+      <a href="{% url 'recommender:index' %}" class="btn btn-danger">新查詢</a>
+    </div>
+
+    {% if suggestions %}
+      {% for s in suggestions %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              {% for yt in s.youtubers.all %}
+              <span class="badge bg-danger me-1">{{ yt.name }}</span>
+              {% endfor %}
+            </div>
+            <small class="text-muted">{{ s.created_at }}</small>
+          </div>
+          <p class="fw-bold mb-2">{{ s.user_query }}</p>
+          <div class="text-secondary small ai-response" style="max-height:120px;overflow:hidden;">
+            {{ s.ai_response|truncatechars:300 }}
+          </div>
+          <a href="{% url 'recommender:result' s.pk %}" class="btn btn-sm btn-outline-danger mt-2">查看完整推薦</a>
+        </div>
+      </div>
+      {% endfor %}
+
+      {% if is_paginated %}
+      <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">上一頁</a></li>
+          {% endif %}
+          <li class="page-item disabled"><span class="page-link">第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 頁</span></li>
+          {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">下一頁</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+
+    {% else %}
+      <div class="card p-5 text-center text-muted">
+        <p class="fs-5">尚無查詢記錄</p>
+        <a href="{% url 'recommender:index' %}" class="btn btn-danger mt-2">開始推薦</a>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

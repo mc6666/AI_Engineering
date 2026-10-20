@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}全面盤點{% endblock %}
+{% block page_title %}全面盤點{% endblock %}
+{% block content %}
+<a href="{% url 'inventory:physical_inventory_start' %}" class="btn btn-primary mb-3">開始全面盤點</a>
+<table class="table table-bordered">
+<thead><tr><th>盤點單號</th><th>倉庫</th><th>狀態</th><th>操作</th></tr></thead>
+<tbody>
+{% for pi in physical_inventories %}
+<tr><td>{{ pi.count_no }}</td><td>{{ pi.warehouse }}</td><td>{{ pi.get_status_display }}</td>
+<td><a href="{% url 'inventory:physical_inventory_detail' pi.pk %}" class="btn btn-sm btn-secondary">檢視</a></td></tr>
+{% empty %}<tr><td colspan="4">尚無盤點單</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

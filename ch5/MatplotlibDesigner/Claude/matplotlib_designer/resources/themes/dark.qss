@@ -1,0 +1,8 @@
+/* Dark theme: low-glare editing chrome for long sessions. */
+QWidget { background-color: #2b2b2f; color: #e6e6e6; }
+QMainWindow, QDockWidget { background-color: #2b2b2f; }
+QToolBar { background-color: #232327; border: none; spacing: 4px; }
+QStatusBar { background-color: #232327; color: #c8c8c8; }
+QTreeWidget, QScrollArea { background-color: #1e1e21; color: #e6e6e6; }
+QTabWidget::pane { border: 1px solid #3a3a40; }
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox { background-color: #38383e; color: #e6e6e6; border: 1px solid #4a4a52; }

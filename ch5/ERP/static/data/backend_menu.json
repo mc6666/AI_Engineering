@@ -1,0 +1,31 @@
+[
+  {
+    "title": "後台首頁 Dashboard",
+    "icon": "bi bi-speedometer2",
+    "url_name": "backend:index",
+    "function_code": null,
+    "children": []
+  },
+  {
+    "title": "權限控管 Access Control",
+    "icon": "bi bi-shield-lock",
+    "url_name": null,
+    "function_code": null,
+    "children": [
+      {
+        "title": "角色管理 Role",
+        "icon": "bi bi-people",
+        "url_name": "backend:role_list",
+        "function_code": "ROLE_MANAGE",
+        "children": []
+      },
+      {
+        "title": "功能管理 Function",
+        "icon": "bi bi-list-check",
+        "url_name": "backend:function_list",
+        "function_code": "FUNCTION_MANAGE",
+        "children": []
+      }
+    ]
+  }
+]

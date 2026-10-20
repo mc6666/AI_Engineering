@@ -1,0 +1,7 @@
+/* IEEE theme: austere greyscale chrome, mirroring IEEE's black-and-white figure conventions. */
+QWidget { background-color: #ececec; color: #000000; }
+QToolBar { background-color: #dcdcdc; border: none; spacing: 4px; }
+QStatusBar { background-color: #dcdcdc; }
+QTreeWidget, QScrollArea { background-color: #ffffff; }
+QTabWidget::pane { border: 1px solid #9a9a9a; }
+QPushButton { border: 1px solid #555555; }

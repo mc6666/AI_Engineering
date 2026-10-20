@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}我的首頁{% endblock %}
+{% block breadcrumb %}首頁{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">您好，{{ request.user.employee.name }}</h4>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card p-3 text-center">
+      <div class="fs-2 fw-bold text-warning">{{ pending_count }}</div>
+      <div class="text-muted small mt-1"><i class="bi bi-clipboard-check me-1"></i>待我簽核</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <a href="{% url 'apply_select' %}" class="card p-3 text-decoration-none d-flex flex-row align-items-center gap-3">
+      <i class="bi bi-pencil-square fs-3 text-primary"></i>
+      <div><div class="fw-semibold text-dark">提出申請</div><div class="text-muted small">選擇簽核類別開始申請</div></div>
+    </a>
+  </div>
+  <div class="col-md-4">
+    <a href="{% url 'pending_approvals' %}" class="card p-3 text-decoration-none d-flex flex-row align-items-center gap-3">
+      <i class="bi bi-check2-all fs-3 text-success"></i>
+      <div><div class="fw-semibold text-dark">待簽核案件</div><div class="text-muted small">處理需要您審核的案件</div></div>
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+<div class="col-md-6">
+  <div class="card p-3">
+    <h6 class="fw-semibold mb-3">最近我的申請</h6>
+    {% if my_cases %}
+    <div class="list-group list-group-flush">
+      {% for case in my_cases %}
+      <a href="{% url 'case_detail' case.pk %}" class="list-group-item list-group-item-action py-2 px-0">
+        <div class="d-flex justify-content-between">
+          <span class="small fw-medium">{{ case.subject|truncatechars:30 }}</span>
+          <span class="badge badge-{{ case.status }}">{{ case.get_status_display }}</span>
+        </div>
+        <small class="text-muted">{{ case.workflow.name }} | {{ case.created_at|date:"Y/m/d" }}</small>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted small">尚無申請記錄</p>
+    {% endif %}
+  </div>
+</div>
+<div class="col-md-6">
+  <div class="card p-3">
+    <h6 class="fw-semibold mb-3">待我簽核</h6>
+    {% if pending_approvals %}
+    <div class="list-group list-group-flush">
+      {% for rec in pending_approvals %}
+      <a href="{% url 'approve_case' rec.pk %}" class="list-group-item list-group-item-action py-2 px-0">
+        <div class="d-flex justify-content-between">
+          <span class="small fw-medium">{{ rec.case.subject|truncatechars:28 }}</span>
+          <span class="badge bg-warning">待處理</span>
+        </div>
+        <small class="text-muted">{{ rec.step_name }} | {{ rec.case.created_by.name }} 申請</small>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted small">目前無待簽核案件</p>
+    {% endif %}
+  </div>
+</div>
+</div>
+{% endblock %}

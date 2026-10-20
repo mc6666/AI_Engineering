@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}建立請購單{% endblock %}
+{% block page_title %}建立請購單 Purchase Requisition{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">建立</button></form>
+{% endblock %}

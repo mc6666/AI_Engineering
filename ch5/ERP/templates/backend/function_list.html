@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}功能管理{% endblock %}
+{% block page_title %}功能管理{% endblock %}
+{% block content %}
+<a href="{% url 'backend:function_add' %}" class="btn btn-primary mb-3">新增功能</a>
+<table class="table table-bordered">
+  <thead>
+    <tr><th>代碼</th><th>名稱</th><th>說明</th><th>操作</th></tr>
+  </thead>
+  <tbody>
+  {% for function in functions %}
+    <tr>
+      <td>{{ function.code }}</td>
+      <td>{{ function.name }}</td>
+      <td>{{ function.description }}</td>
+      <td>
+        <a href="{% url 'backend:function_edit' function.pk %}" class="btn btn-sm btn-secondary">編輯</a>
+        <a href="{% url 'backend:function_delete' function.pk %}" class="btn btn-sm btn-danger">刪除</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="4">尚無功能資料</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,11 @@
+[
+  {
+    "label": "權限控管",
+    "icon": "bi bi-shield-lock",
+    "children": [
+      { "code": "admin.users", "label": "使用者管理", "path": "/admin/users", "icon": "bi bi-person-gear" },
+      { "code": "admin.roles", "label": "角色管理", "path": "/admin/roles", "icon": "bi bi-people-fill" },
+      { "code": "admin.functions", "label": "功能權限管理", "path": "/admin/functions", "icon": "bi bi-key" }
+    ]
+  }
+]

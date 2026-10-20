@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}指派功能{% endblock %}
+{% block page_title %}指派功能給角色：{{ object.name }}{% endblock %}
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+  {{ form.functions }}
+  <button type="submit" class="btn btn-primary mt-3">儲存</button>
+  <a href="{% url 'backend:role_list' %}" class="btn btn-secondary mt-3">取消</a>
+</form>
+{% endblock %}

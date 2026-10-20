@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}批號管理{% endblock %}
+{% block page_title %}批號管理{% endblock %}
+{% block content %}
+<a href="{% url 'inventory:lot_add' %}" class="btn btn-primary mb-3">新增批號</a>
+<table class="table table-bordered">
+<thead><tr><th>商品</th><th>批號</th><th>製造日期</th><th>到期日</th><th>供應商</th><th>數量</th><th>操作</th></tr></thead>
+<tbody>
+{% for lot in lots %}
+<tr class="{% if lot.is_expired %}table-danger{% endif %}">
+<td>{{ lot.item }}</td><td>{{ lot.lot_number }}</td><td>{{ lot.manufacture_date|default:'-' }}</td><td>{{ lot.expiry_date|default:'-' }}</td><td>{{ lot.supplier_name }}</td><td>{{ lot.quantity }}</td>
+<td><a href="{% url 'inventory:lot_edit' lot.pk %}" class="btn btn-sm btn-secondary">編輯</a></td>
+</tr>
+{% empty %}<tr><td colspan="7">尚無批號資料</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

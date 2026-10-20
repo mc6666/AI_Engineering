@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}採購儀表板{% endblock %}
+{% block page_title %}採購儀表板 Procurement Dashboard{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-3">
+    <div class="small-box bg-info">
+      <div class="inner"><h3>{{ dashboard.open_po_count }}</h3><p>進行中採購單</p></div>
+      <div class="icon"><i class="bi bi-cart"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-warning">
+      <div class="inner"><h3>{{ dashboard.pending_approval_count }}</h3><p>待核准</p></div>
+      <div class="icon"><i class="bi bi-hourglass-split"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-danger">
+      <div class="inner"><h3>{{ dashboard.overdue_count }}</h3><p>逾期未到貨</p></div>
+      <div class="icon"><i class="bi bi-exclamation-triangle"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="small-box bg-secondary">
+      <div class="inner"><h3>{{ dashboard.unpaid_invoice_count }}</h3><p>未付款發票</p></div>
+      <div class="icon"><i class="bi bi-receipt"></i></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">逾期未到貨採購單</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>採購單號</th><th>供應商</th><th>預計到貨日</th></tr></thead>
+          <tbody>
+          {% for po in dashboard.overdue_pos %}
+            <tr><td><a href="{% url 'purchase:order_detail' po.pk %}">{{ po.po_number }}</a></td><td>{{ po.supplier }}</td><td>{{ po.expected_arrival_date }}</td></tr>
+          {% empty %}<tr><td colspan="3">無逾期採購單</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">補貨建議（來自庫存管理）</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead><tr><th>商品</th><th>倉庫</th><th>建議採購量</th></tr></thead>
+          <tbody>
+          {% for s in dashboard.reorder_suggestions %}
+            <tr><td>{{ s.item }}</td><td>{{ s.warehouse }}</td><td>{{ s.suggested_qty }}</td></tr>
+          {% empty %}<tr><td colspan="3">目前無需補貨</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

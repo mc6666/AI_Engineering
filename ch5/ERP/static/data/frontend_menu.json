@@ -1,0 +1,264 @@
+[
+  {
+    "title": "首頁 Dashboard",
+    "icon": "bi bi-speedometer2",
+    "url_name": "frontend:index",
+    "function_code": null,
+    "children": []
+  },
+  {
+    "title": "採購管理 Purchase",
+    "icon": "bi bi-cart",
+    "url_name": null,
+    "function_code": null,
+    "children": [
+      {
+        "title": "採購儀表板",
+        "icon": "bi bi-speedometer",
+        "url_name": "purchase:index",
+        "function_code": "PO_DASHBOARD",
+        "children": []
+      },
+      {
+        "title": "供應商管理",
+        "icon": "bi bi-building",
+        "url_name": "purchase:supplier_list",
+        "function_code": "PO_SUPPLIER",
+        "children": []
+      },
+      {
+        "title": "供應商績效評分卡",
+        "icon": "bi bi-star",
+        "url_name": "purchase:supplier_scorecard",
+        "function_code": "PO_SUPPLIER",
+        "children": []
+      },
+      {
+        "title": "請購單",
+        "icon": "bi bi-file-earmark-plus",
+        "url_name": "purchase:requisition_list",
+        "function_code": "PO_REQUISITION",
+        "children": []
+      },
+      {
+        "title": "詢價單 RFQ",
+        "icon": "bi bi-envelope-paper",
+        "url_name": "purchase:rfq_list",
+        "function_code": "PO_RFQ",
+        "children": []
+      },
+      {
+        "title": "採購訂單",
+        "icon": "bi bi-cart-check",
+        "url_name": "purchase:order_list",
+        "function_code": "PO_ORDER",
+        "children": []
+      },
+      {
+        "title": "補貨建議",
+        "icon": "bi bi-arrow-clockwise",
+        "url_name": "purchase:reorder_suggestions",
+        "function_code": "PO_REORDER",
+        "children": []
+      }
+    ]
+  },
+  {
+    "title": "銷售管理 Sales",
+    "icon": "bi bi-currency-dollar",
+    "url_name": null,
+    "function_code": null,
+    "children": [
+      {
+        "title": "銷售儀表板",
+        "icon": "bi bi-speedometer",
+        "url_name": "sales:index",
+        "function_code": "SO_DASHBOARD",
+        "children": []
+      },
+      {
+        "title": "客戶管理",
+        "icon": "bi bi-person-badge",
+        "url_name": "sales:customer_list",
+        "function_code": "SO_CUSTOMER",
+        "children": []
+      },
+      {
+        "title": "銷售訂單查詢",
+        "icon": "bi bi-search",
+        "url_name": "sales:order_list",
+        "function_code": "SO_ORDER",
+        "children": []
+      },
+      {
+        "title": "新增銷售訂單",
+        "icon": "bi bi-file-earmark-plus",
+        "url_name": "sales:order_add",
+        "function_code": "SO_ORDER",
+        "children": []
+      },
+      {
+        "title": "匯入銷售訂單",
+        "icon": "bi bi-upload",
+        "url_name": "sales:import_csv",
+        "function_code": "SO_IMPORT_EXPORT",
+        "children": []
+      },
+      {
+        "title": "匯出銷售訂單",
+        "icon": "bi bi-download",
+        "url_name": "sales:export_csv",
+        "function_code": "SO_IMPORT_EXPORT",
+        "children": []
+      }
+    ]
+  },
+  {
+    "title": "庫存管理 Inventory",
+    "icon": "bi bi-box-seam",
+    "url_name": null,
+    "function_code": null,
+    "children": [
+      {
+        "title": "庫存儀表板",
+        "icon": "bi bi-speedometer",
+        "url_name": "inventory:index",
+        "function_code": "INV_DASHBOARD",
+        "children": []
+      },
+      {
+        "title": "商品主檔",
+        "icon": "bi bi-box",
+        "url_name": "inventory:item_list",
+        "function_code": "INV_ITEM",
+        "children": []
+      },
+      {
+        "title": "商品分類",
+        "icon": "bi bi-tags",
+        "url_name": "inventory:category_list",
+        "function_code": "INV_ITEM",
+        "children": []
+      },
+      {
+        "title": "倉庫管理",
+        "icon": "bi bi-building",
+        "url_name": "inventory:warehouse_list",
+        "function_code": "INV_WAREHOUSE",
+        "children": []
+      },
+      {
+        "title": "庫存查詢",
+        "icon": "bi bi-search",
+        "url_name": "inventory:stock_search",
+        "function_code": "INV_STOCK_QUERY",
+        "children": []
+      },
+      {
+        "title": "庫存異動明細",
+        "icon": "bi bi-list-ul",
+        "url_name": "inventory:transaction_list",
+        "function_code": "INV_STOCK_QUERY",
+        "children": []
+      },
+      {
+        "title": "入庫",
+        "icon": "bi bi-box-arrow-in-down",
+        "url_name": "inventory:receive",
+        "function_code": "INV_STOCK_OPS",
+        "children": []
+      },
+      {
+        "title": "出庫",
+        "icon": "bi bi-box-arrow-up",
+        "url_name": "inventory:issue",
+        "function_code": "INV_STOCK_OPS",
+        "children": []
+      },
+      {
+        "title": "庫存調撥",
+        "icon": "bi bi-arrow-left-right",
+        "url_name": "inventory:transfer",
+        "function_code": "INV_STOCK_OPS",
+        "children": []
+      },
+      {
+        "title": "庫存預留",
+        "icon": "bi bi-bookmark-check",
+        "url_name": "inventory:reserve",
+        "function_code": "INV_STOCK_OPS",
+        "children": []
+      },
+      {
+        "title": "解除預留",
+        "icon": "bi bi-bookmark-x",
+        "url_name": "inventory:release",
+        "function_code": "INV_STOCK_OPS",
+        "children": []
+      },
+      {
+        "title": "庫存調整申請",
+        "icon": "bi bi-sliders",
+        "url_name": "inventory:adjustment_list",
+        "function_code": "INV_ADJUSTMENT",
+        "children": []
+      },
+      {
+        "title": "循環盤點",
+        "icon": "bi bi-arrow-repeat",
+        "url_name": "inventory:cycle_count_list",
+        "function_code": "INV_COUNT",
+        "children": []
+      },
+      {
+        "title": "全面盤點",
+        "icon": "bi bi-clipboard-check",
+        "url_name": "inventory:physical_inventory_list",
+        "function_code": "INV_COUNT",
+        "children": []
+      },
+      {
+        "title": "批號管理",
+        "icon": "bi bi-upc",
+        "url_name": "inventory:lot_list",
+        "function_code": "INV_LOT_SERIAL",
+        "children": []
+      },
+      {
+        "title": "序號管理",
+        "icon": "bi bi-upc-scan",
+        "url_name": "inventory:serial_list",
+        "function_code": "INV_LOT_SERIAL",
+        "children": []
+      },
+      {
+        "title": "條碼掃描",
+        "icon": "bi bi-qr-code-scan",
+        "url_name": "inventory:scan",
+        "function_code": "INV_LOT_SERIAL",
+        "children": []
+      },
+      {
+        "title": "補貨建議",
+        "icon": "bi bi-arrow-clockwise",
+        "url_name": "inventory:reorder_suggestions",
+        "function_code": "INV_REORDER",
+        "children": []
+      },
+      {
+        "title": "效期管理",
+        "icon": "bi bi-calendar-x",
+        "url_name": "inventory:expiration",
+        "function_code": "INV_REORDER",
+        "children": []
+      },
+      {
+        "title": "庫存報表",
+        "icon": "bi bi-file-earmark-bar-graph",
+        "url_name": "inventory:report",
+        "function_code": "INV_STOCK_QUERY",
+        "children": []
+      }
+    ]
+  }
+]

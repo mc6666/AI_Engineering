@@ -1,0 +1,61 @@
+sequenceDiagram
+    autonumber
+
+    actor Employee as Requester
+    participant PR as Purchase Requisition System
+    participant Manager as Department Manager
+    participant Purchasing as Purchasing Department
+    participant Supplier
+    participant Warehouse
+    participant Inventory
+    participant AP as Accounts Payable
+    participant Finance
+
+    %% Purchase Requisition
+    Employee->>PR: Create Purchase Requisition
+    PR->>Manager: Submit for Approval
+
+    alt Approved
+        Manager-->>PR: Approve Requisition
+        PR->>Purchasing: Generate Purchase Request
+
+        %% Supplier Selection
+        Purchasing->>Supplier: Request Quotation (RFQ)
+        Supplier-->>Purchasing: Submit Quotation
+        Purchasing->>Purchasing: Evaluate Quotations
+        Purchasing->>Supplier: Issue Purchase Order (PO)
+        Supplier-->>Purchasing: Confirm PO
+
+        %% Goods Delivery
+        Supplier->>Warehouse: Deliver Goods
+        Warehouse->>Warehouse: Inspect Quantity & Quality
+
+        alt Goods Accepted
+            Warehouse->>Inventory: Receive Goods
+            Inventory-->>PR: Update Inventory
+            Warehouse-->>Purchasing: Goods Receipt Note (GRN)
+        else Goods Rejected
+            Warehouse-->>Supplier: Reject / Return Goods
+            Supplier-->>Warehouse: Replacement Delivery
+        end
+
+        %% Invoice Processing
+        Supplier->>AP: Send Invoice
+        AP->>Purchasing: Retrieve Purchase Order
+        AP->>Warehouse: Retrieve Goods Receipt
+
+        AP->>AP: Three-Way Match\n(PO + GRN + Invoice)
+
+        alt Match Successful
+            AP->>Finance: Request Payment Approval
+            Finance-->>AP: Payment Approved
+            Finance->>Supplier: Make Payment
+            Supplier-->>Finance: Payment Receipt
+        else Match Failed
+            AP-->>Purchasing: Invoice Exception
+            Purchasing->>Supplier: Resolve Discrepancy
+        end
+
+    else Rejected
+        Manager-->>Employee: Requisition Rejected
+    end

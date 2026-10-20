@@ -1,0 +1,39 @@
+[
+  {
+    "id": "001",
+    "code": "HEAD",
+    "name": "總經理",
+    "parent_code": null,
+    "manager_id": 5,
+    "agent_id": null,
+    "children": [
+      {
+        "id": "002",
+        "code": "HR",
+        "name": "人力資源部",
+        "parent_code": "HEAD",
+        "manager_id": 6,
+        "agent_id": null,
+        "children": []
+      },
+      {
+        "id": "004",
+        "code": "Affairs",
+        "name": "總務組",
+        "parent_code": "HEAD",
+        "manager_id": 7,
+        "agent_id": null,
+        "children": []
+      },
+      {
+        "id": "003",
+        "code": "IT",
+        "name": "資訊技術部",
+        "parent_code": "HEAD",
+        "manager_id": 3,
+        "agent_id": null,
+        "children": []
+      }
+    ]
+  }
+]

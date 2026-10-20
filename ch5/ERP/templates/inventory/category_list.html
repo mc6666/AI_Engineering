@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}商品分類{% endblock %}
+{% block page_title %}商品分類{% endblock %}
+{% block content %}
+<a href="{% url 'inventory:category_add' %}" class="btn btn-primary mb-3">新增分類</a>
+<table class="table table-bordered">
+<thead><tr><th>代號</th><th>名稱</th><th>操作</th></tr></thead>
+<tbody>
+{% for c in categories %}
+<tr><td>{{ c.code }}</td><td>{{ c.name }}</td><td><a href="{% url 'inventory:category_delete' c.pk %}" class="btn btn-sm btn-danger">刪除</a></td></tr>
+{% empty %}<tr><td colspan="3">尚無分類資料</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

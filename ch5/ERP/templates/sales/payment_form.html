@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}登記收款{% endblock %}
+{% block page_title %}登記收款：{{ invoice.invoice_no }}{% endblock %}
+{% block content %}
+<p>發票金額：{{ invoice.amount }}｜已收款：{{ invoice.paid_amount }}｜未收款餘額：{{ invoice.outstanding }}</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">登記收款</button> <a href="{% url 'sales:order_detail' invoice.sales_order_id %}" class="btn btn-secondary">取消</a></form>
+{% endblock %}

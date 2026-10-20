@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}補貨建議{% endblock %}
+{% block page_title %}補貨建議（來自庫存管理）{% endblock %}
+{% block content %}
+<table class="table table-bordered">
+<thead><tr><th>商品</th><th>倉庫</th><th>可用庫存</th><th>再訂購點</th><th>安全庫存</th><th>前置時間</th><th>建議採購量</th></tr></thead>
+<tbody>
+{% for s in suggestions %}
+<tr><td>{{ s.item }}</td><td>{{ s.warehouse }}</td><td>{{ s.available }}</td><td>{{ s.reorder_point }}</td><td>{{ s.safety_stock }}</td><td>{{ s.lead_time_days }} 天</td><td>{{ s.suggested_qty }}</td></tr>
+{% empty %}<tr><td colspan="7">目前無需補貨的商品</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

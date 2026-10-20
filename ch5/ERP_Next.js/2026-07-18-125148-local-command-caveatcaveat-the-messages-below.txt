@@ -1,0 +1,2037 @@
+ ▐▛███▜▌   Claude Code v2.1.214
+▝▜█████▛▘  Sonnet 5 · Claude Pro
+  ▘▘ ▝▝    D:\0_AI\Books\SDD\src\ch5\ERP_Next.js
+
+ ▎ Extended through July 19
+ ▎ We're extending Claude Fable 5 access on all paid plans, as well as keeping Claude Code’s weekly rate limits 50% higher, through July 19.
+ ▎
+ ▎ As before, you can use up to half of your weekly usage limit on Fable 5. After that, you can keep using Fable 5 with usage credits, or switch to another model to keep working within your remaining limits.
+ ▎
+ ▎ More details here: https://support.claude.com/en/articles/15424964-claude-fable-5-promotional-access
+
+> /clear                                                                        
+
+> generate code without AI functions                                            
+
+  Searched for 1 pattern, read 4 files, listed 1 directory (ctrl+o to expand)
+
+● I found the context — the .claude/skills/ folder has three spec files
+  (PurchaseOrder, SalesOrder, Inventory) that each define core business skills
+  and a separate "AI 智慧技能 (AI Skills)" section (natural-language query, AI
+  recommendations, forecasting, anomaly detection). "Generate code without AI
+  functions" reads as: implement the ERP per Architecture.md, but skip those
+  AI-Skills sections in each spec.
+
+  The working directory is currently empty except for
+  CLAUDE.md/Architecture.md/the skill specs — no Next.js project has been
+  scaffolded yet. Given the scope (3 modules × ~20 skills each, plus
+  auth/RBAC/sidebar infra from Architecture.md), I want to confirm approach
+  before generating a large amount of code.
+
+● User answered Claude's questions:
+  ⎿  · How should I scope the first pass of code generation? → Foundation + all 
+     3 modules at once
+     · Confirm what "without AI functions" excludes from each skill spec → 
+     Exclude entire "AI 智慧技能" sections (Recommended)
+
+  Ran 1 shell command (ctrl+o to expand)
+  Read 1 file, listed 1 directory, ran 4 shell commands (ctrl+o to expand)
+
+● Good, existing CLAUDE.md and Architecture.md are preserved. Now fix the
+  package name and install dependencies.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(package.json)
+  ⎿  Added 1 line, removed 1 line
+      1  {
+      2 -  "name": "erp-scaffold",                                       
+      2 +  "name": "erp-nextjs",                                         
+      3    "version": "0.1.0",
+      4    "private": true,
+      5    "scripts": {
+
+● This scaffolded Next.js 16 — I'll load the Next.js skill to make sure route
+  handlers, dynamic params, and layouts follow its current
+  (breaking-change-laden) patterns before I write dozens of routes.
+
+● Skill(nextjs)
+  ⎿  Successfully loaded skill · 6 tools allowed
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Scaffold's installing in the background. I'll write the DB schema while that
+  finishes.
+
+● Write(lib\schema.sql)
+  ⎿  Wrote 358 lines to lib\schema.sql
+       1 -- ============ AUTH / RBAC ============
+       2 CREATE TABLE IF NOT EXISTS users (
+       3   id INTEGER PRIMARY KEY AUTOINCREMENT,
+       4   username TEXT UNIQUE NOT NULL,
+       5   email TEXT UNIQUE NOT NULL,
+       6   password_hash TEXT NOT NULL,
+       7   full_name TEXT NOT NULL,
+       8   is_active INTEGER NOT NULL DEFAULT 1,
+       9   created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      10 );
+     … +366 lines (ctrl+o to expand)
+
+  Read 1 file (ctrl+o to expand)
+
+● Write(lib\db.js)
+  ⎿  Wrote 35 lines to lib\db.js
+       1 import Database from 'better-sqlite3';
+       2 import path from 'node:path';
+       3 import fs from 'node:fs';
+       4 
+       5 const DB_PATH = path.join(process.cwd(), 'data', 'erp.db');
+         );
+       7 
+       8 function createConnection() {
+       9   fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+      10   const conn = new Database(DB_PATH);
+     … +29 lines (ctrl+o to expand)
+
+● Update(lib\db.js)
+  ⎿  Added 2 lines, removed 7 lines
+      18  const globalForDb = globalThis;
+      19  export const db = globalForDb.__erpDb || (globalForDb.__erpDb =
+           createConnection());
+      20  
+      21 +// Document numbers only need to be unique, not sequential, so 
+         +a timestamp +                                                  
+      22 +// random suffix avoids a dedicated per-document-type sequence 
+         +table.                                                         
+      23  export function nextDocNo(prefix) {
+      24    const stamp = new Date();
+      25    const y = stamp.getFullYear();
+      26    const m = String(stamp.getMonth() + 1).padStart(2, '0');
+      27    const d = String(stamp.getDate()).padStart(2, '0');
+      26 -  const seqRow = db                                            
+      27 -    .prepare(                                                  
+      28 -      `SELECT COUNT(*) AS n FROM sqlite_sequence WHERE name = ?
+         -`                                                              
+      29 -    )                                                          
+      30 -    .get('__unused__');                                        
+      31 -  // Use a monotonically increasing counter based on current ti
+         -mestamp + random suffix                                        
+      32 -  // to keep document numbers unique without a dedicated sequen
+         -ce table per doc type.                                         
+      28    const rand = Math.floor(Math.random() * 900 + 100);
+      29    return `${prefix}${y}${m}${d}${String(Date.now()).slice(-5)}$
+          {rand}`;
+      30  }
+
+● Now let's check on the npm install.
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Still running with no output yet — normal for a first npm install. I'll
+  continue building lib modules while it finishes.
+
+● Write(lib\auth.js)
+  ⎿  Wrote 122 lines to lib\auth.js
+       1 import bcrypt from 'bcryptjs';
+       2 import jwt from 'jsonwebtoken';
+       3 import { cookies } from 'next/headers';
+       5 
+       6 const SESSION_COOKIE = 'erp_session';
+       7 const SESSION_SECRET = process.env.SESSION_SECRET || 'dev-only-i
+         nsecure-secret-change-me';
+       9 
+      10 export function registerUser({ username, email, password, fullNa
+         me }) {
+     … +126 lines (ctrl+o to expand)
+
+● Write(data\sidebar-portal.json)
+  ⎿  Wrote 43 lines to data\sidebar-portal.json
+       1 [
+       3     "label": "庫存管理",
+       5     "children": [
+       6       { "code": "inventory.dashboard", "label": "庫存儀表板", "p
+         " },
+         "/portal/inventory/items", "icon": "bi bi-box-seam" },
+         th": "/portal/inventory/warehouses", "icon": "bi bi-building" },
+       9       { "code": "inventory.receipts", "label": "入庫管理", "path
+         n" },
+          "/portal/inventory/issues", "icon": "bi bi-box-arrow-up" },
+     … +59 lines (ctrl+o to expand)
+
+● Background command "cd "D:\0_AI\Books\SDD\src\ch5\ERP_Next.js" &amp;&amp; npm
+install 2&gt;&amp;1 | tail -30" completed (exit code 0)
+
+● npm install finished. Let's add the remaining dependencies (better-sqlite3,
+  bcryptjs, jsonwebtoken) and confirm they build cleanly.
+
+  Ran 1 shell command (ctrl+o to expand)
+● Continuing with the admin sidebar JSON and permission/sidebar helper while
+  that installs.
+
+● Write(data\sidebar-admin.json)
+  ⎿  Wrote 11 lines to data\sidebar-admin.json
+       1 [
+       2   {
+       4     "icon": "bi bi-shield-lock",
+       5     "children": [
+       6       { "code": "admin.users", "label": "使用者管理", "path": "/
+       7       { "code": "admin.roles", "label": "角色管理", "path": "/ad
+         min/roles", "icon": "bi bi-people-fill" },
+       8       { "code": "admin.functions", "label": "功能權限管理", "pat
+       9     ]
+      10   }
+     … +4 lines (ctrl+o to expand)
+
+● Write(lib\sidebar.js)
+  ⎿  Wrote 29 lines to lib\sidebar.js
+       1 import path from 'node:path';
+       2 import fs from 'node:fs';
+       3 
+       4 function loadTree(fileName) {
+       5   const filePath = path.join(process.cwd(), 'data', fileName);
+       7 }
+       8 
+       9 // Keeps only leaf nodes the user has permission for, and drops 
+         any
+      10 // group whose children all got filtered out.
+     … +19 lines (ctrl+o to expand)
+
+  Read 1 file (ctrl+o to expand)
+
+● Background command "cd "D:\0_AI\Books\SDD\src\ch5\ERP_Next.js" &amp;&amp; npm
+install better-sqlite3 bcryptjs jsonwebtoken 2&gt;&amp;1 | tail -60" completed
+(exit code 0)
+
+● Dependencies installed. Now I'll add auto-seeding (functions derived from the
+  sidebar JSON, an Administrator role with full permissions, and a default admin
+  login) to db.js.
+
+● Update(lib\db.js)
+  ⎿  Added 59 lines
+       1  import Database from 'better-sqlite3';
+       2 +import bcrypt from 'bcryptjs';                                 
+       3  import path from 'node:path';
+       4  import fs from 'node:fs';
+       5  
+       6  const DB_PATH = path.join(process.cwd(), 'data', 'erp.db');
+       7  const SCHEMA_PATH = path.join(process.cwd(), 'lib', 'schema.sql
+          ');
+       8  
+       9 +// Sidebar JSON files double as the source of truth for permiss
+         +ion "functions":                                               
+      10 +// every leaf node's `code` becomes a row in the functions tabl
+         +e.                                                             
+      11 +function flattenFunctionCodes(nodes, module) {                 
+      12 +  const out = [];                                              
+      13 +  for (const node of nodes) {                                  
+      14 +    if (node.children) {                                       
+      15 +      out.push(...flattenFunctionCodes(node.children, module));
+      16 +    } else {                                                   
+      17 +      out.push({ code: node.code, name: node.label, module }); 
+      18 +    }                                                          
+      19 +  }                                                            
+      20 +  return out;                                                  
+      21 +}                                                              
+      22 +                                                               
+      23 +function seedIfEmpty(conn) {                                   
+      24 +  const { n } = conn.prepare('SELECT COUNT(*) AS n FROM functio
+         +ns').get();                                                    
+      25 +  if (n > 0) return;                                           
+      26 +                                                               
+      27 +  const portal = JSON.parse(                                   
+      28 +    fs.readFileSync(path.join(process.cwd(), 'data', 'sidebar-p
+         +ortal.json'), 'utf8')                                          
+      29 +  );                                                           
+      30 +  const admin = JSON.parse(                                    
+      31 +    fs.readFileSync(path.join(process.cwd(), 'data', 'sidebar-a
+         +dmin.json'), 'utf8')                                           
+      32 +  );                                                           
+      33 +  const allFunctions = [                                       
+      34 +    ...flattenFunctionCodes(portal, 'portal'),                 
+      35 +    ...flattenFunctionCodes(admin, 'admin'),                   
+      36 +  ];                                                           
+      37 +                                                               
+      38 +  const insertFn = conn.prepare(                               
+      39 +    'INSERT INTO functions (code, name, module) VALUES (?, ?, ?
+         +)'                                                             
+      40 +  );                                                           
+      41 +  const insertRoleFn = conn.prepare(                           
+      42 +    'INSERT INTO role_functions (role_id, function_id) VALUES (
+         +?, ?)'                                                         
+      43 +  );                                                           
+      44 +                                                               
+      45 +  const seedTxn = conn.transaction(() => {                     
+      46 +    const roleId = conn                                        
+      47 +      .prepare('INSERT INTO roles (name, description) VALUES (?
+         +, ?)')                                                         
+      48 +      .run('Administrator', '系統管理員，擁有所有功能權限').las
+         +tInsertRowid;                                                  
+      49 +                                                               
+      50 +    for (const fn of allFunctions) {                           
+      51 +      const fnId = insertFn.run(fn.code, fn.name, fn.module).la
+         +stInsertRowid;                                                 
+      52 +      insertRoleFn.run(roleId, fnId);                          
+      53 +    }                                                          
+      54 +                                                               
+      55 +    const passwordHash = bcrypt.hashSync('admin123', 10);      
+      56 +    const userId = conn                                        
+      57 +      .prepare(                                                
+      58 +        'INSERT INTO users (username, email, password_hash, ful
+         +l_name) VALUES (?, ?, ?, ?)'                                   
+      59 +      )                                                        
+      60 +      .run('admin', 'admin@example.com', passwordHash, 'System 
+         +Administrator').lastInsertRowid;                               
+      61 +    conn.prepare('INSERT INTO user_roles (user_id, role_id) VAL
+         +UES (?, ?)').run(userId, roleId);                              
+      62 +  });                                                          
+      63 +  seedTxn();                                                   
+      64 +}                                                              
+      65 +                                                               
+      66  function createConnection() {
+      67    fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+      68    const conn = new Database(DB_PATH);
+      69    conn.pragma('journal_mode = WAL');
+      70    conn.pragma('foreign_keys = ON');
+      71    conn.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
+      72 +  seedIfEmpty(conn);                                           
+      73    return conn;
+      74  }
+      75  
+
+  Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+● Write(app\layout.js)
+  ⎿  Added 24 lines, removed 15 lines
+       1 -import { Geist, Geist_Mono } from "next/font/google";          
+       1  import "./globals.css";
+       2  
+       4 -const geistSans = Geist({                                      
+       5 -  variable: "--font-geist-sans",                               
+       6 -  subsets: ["latin"],                                          
+       7 -});                                                            
+       8 -                                                               
+       9 -const geistMono = Geist_Mono({                                 
+      10 -  variable: "--font-geist-mono",                               
+      11 -  subsets: ["latin"],                                          
+      12 -});                                                            
+      13 -                                                               
+       3  export const metadata = {
+      15 -  title: "Create Next App",                                    
+      16 -  description: "Generated by create next app",                 
+       4 +  title: "ERP System",                                         
+       5 +  description: "Purchase Order, Sales Order and Inventory Manag
+         +ement",                                                        
+       6  };
+       7  
+       8  export default function RootLayout({ children }) {
+       9    return (
+      21 -    <html lang="en" className={`${geistSans.variable} ${geistMo
+         -no.variable}`}>                                                
+      22 -      <body>{children}</body>                                  
+      10 +    <html lang="zh-Hant">                                      
+      11 +      <head>                                                   
+      12 +        <link                                                  
+      13 +          rel="stylesheet"                                     
+      14 +          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.
+         +13.1/font/bootstrap-icons.min.css"                             
+      15 +        />                                                     
+      16 +        <link                                                  
+      17 +          rel="stylesheet"                                     
+      18 +          href="https://cdn.jsdelivr.net/npm/overlayscrollbars@
+         +2.11.0/styles/overlayscrollbars.min.css"                       
+      19 +        />                                                     
+      20 +        <link                                                  
+      21 +          rel="stylesheet"                                     
+      22 +          href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0/di
+         +st/css/adminlte.min.css"                                       
+      23 +        />                                                     
+      24 +      </head>                                                  
+      25 +      <body>                                                   
+      26 +        {children}                                             
+      27 +        <script src="https://cdn.jsdelivr.net/npm/@popperjs/cor
+         +e@2.11.8/dist/umd/popper.min.js"></script>                     
+      28 +        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3
+         +.8/dist/js/bootstrap.min.js"></script>                         
+      29 +        <script src="https://cdn.jsdelivr.net/npm/overlayscroll
+         +bars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"></scr
+         +ipt>                                                           
+      30 +        <script src="https://cdn.jsdelivr.net/npm/admin-lte@4.0
+         +.0/dist/js/adminlte.min.js"></script>                          
+      31 +      </body>                                                  
+      32      </html>
+      33    );
+      34  }
+
+  Read 1 file (ctrl+o to expand)
+
+● Write(app\globals.css)
+  ⎿  Removed 42 lines
+       1 -:root {                                                        
+       2 -  --background: #ffffff;                                       
+       3 -  --foreground: #171717;                                       
+       4 -}                                                              
+       5 -                                                               
+       6 -@media (prefers-color-scheme: dark) {                          
+       7 -  :root {                                                      
+       8 -    --background: #0a0a0a;                                     
+       9 -    --foreground: #ededed;                                     
+      10 -  }                                                            
+      11 -}                                                              
+      12 -                                                               
+      13 -html {                                                         
+      14 -  height: 100%;                                                
+      15 -}                                                              
+      16 -                                                               
+      17 -html,                                                          
+      18 -body {                                                         
+      19 -  max-width: 100vw;                                            
+      20 -  overflow-x: hidden;                                          
+      21 -}                                                              
+      22 -                                                               
+      23 -body {                                                         
+      24 -  min-height: 100%;                                            
+      25 -  display: flex;                                               
+      26 -  flex-direction: column;                                      
+      27 -  color: var(--foreground);                                    
+      28 -  background: var(--background);                               
+      29 -  font-family: Arial, Helvetica, sans-serif;                   
+      30 -  -webkit-font-smoothing: antialiased;                         
+      31 -  -moz-osx-font-smoothing: grayscale;                          
+      32 -}                                                              
+      33 -                                                               
+       1  * {
+       2    box-sizing: border-box;
+      36 -  padding: 0;                                                  
+      37 -  margin: 0;                                                   
+       3  }
+       4  
+       5  a {
+      41 -  color: inherit;                                              
+       6    text-decoration: none;
+       7  }
+      44 -                                                               
+      45 -@media (prefers-color-scheme: dark) {                          
+      46 -  html {                                                       
+      47 -    color-scheme: dark;                                        
+      48 -  }                                                            
+      49 -}                                                              
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Now the root page (redirect based on session) and the
+  login/register/change-password pages with server actions.
+
+● Write(app\page.js)
+  ⎿  Error writing file
+
+  Read 1 file (ctrl+o to expand)
+
+● Write(app\page.js)
+  ⎿  Added 5 lines, removed 64 lines
+       1 -import Image from "next/image";                                
+       2 -import styles from "./page.module.css";                        
+       1 +import { redirect } from 'next/navigation';                    
+       2 +import { getCurrentUser } from '@/lib/auth';                   
+       3  
+       4 -export default function Home() {                               
+       5 -  return (                                                     
+       6 -    <div className={styles.page}>                              
+       7 -      <main className={styles.main}>                           
+       8 -        <Image                                                 
+       9 -          className={styles.logo}                              
+      10 -          src="/next.svg"                                      
+      11 -          alt="Next.js logo"                                   
+      12 -          width={100}                                          
+      13 -          height={20}                                          
+      14 -          priority                                             
+      15 -        />                                                     
+      16 -        <div className={styles.intro}>                         
+      17 -          <h1>To get started, edit the page.js file.</h1>      
+      18 -          <p>                                                  
+      19 -            Looking for a starting point or more instructions? 
+         -Head over to{" "}                                              
+      20 -            <a                                                 
+      21 -              href="https://vercel.com/templates?framework=next
+         -.js&utm_source=create-next-app&utm_medium=appdir-template-tw&ut
+         -m_campaign=create-next-app"                                    
+      22 -              target="_blank"                                  
+      23 -              rel="noopener noreferrer"                        
+      24 -            >                                                  
+      25 -              Templates                                        
+      26 -            </a>{" "}                                          
+      27 -            or the{" "}                                        
+      28 -            <a                                                 
+      29 -              href="https://nextjs.org/learn?utm_source=create-
+         -next-app&utm_medium=appdir-template-tw&utm_campaign=create-next
+         --app"                                                          
+      30 -              target="_blank"                                  
+      31 -              rel="noopener noreferrer"                        
+      32 -            >                                                  
+      33 -              Learning                                         
+      34 -            </a>{" "}                                          
+      35 -            center.                                            
+      36 -          </p>                                                 
+      37 -        </div>                                                 
+      38 -        <div className={styles.ctas}>                          
+      39 -          <a                                                   
+      40 -            className={styles.primary}                         
+      41 -            href="https://vercel.com/new?utm_source=create-next
+         --app&utm_medium=appdir-template&utm_campaign=create-next-app"  
+      42 -            target="_blank"                                    
+      43 -            rel="noopener noreferrer"                          
+      44 -          >                                                    
+      45 -            <Image                                             
+      46 -              className={styles.logo}                          
+      47 -              src="/vercel.svg"                                
+      48 -              alt="Vercel logomark"                            
+      49 -              width={16}                                       
+      50 -              height={16}                                      
+      51 -            />                                                 
+      52 -            Deploy Now                                         
+      53 -          </a>                                                 
+      54 -          <a                                                   
+      55 -            className={styles.secondary}                       
+      56 -            href="https://nextjs.org/docs?utm_source=create-nex
+         -t-app&utm_medium=appdir-template&utm_campaign=create-next-app" 
+      57 -            target="_blank"                                    
+      58 -            rel="noopener noreferrer"                          
+      59 -          >                                                    
+      60 -            Documentation                                      
+      61 -          </a>                                                 
+      62 -        </div>                                                 
+      63 -      </main>                                                  
+      64 -    </div>                                                     
+      65 -  );                                                           
+       4 +export default async function RootPage() {                     
+       5 +  const user = await getCurrentUser();                         
+       6 +  redirect(user ? '/portal' : '/login');                       
+       7  }
+
+● Write(app\actions\auth.js)
+  ⎿  Wrote 67 lines to app\actions\auth.js
+       1 'use server';
+       2 
+       3 import { redirect } from 'next/navigation';
+       4 import {
+       5   registerUser,
+       6   verifyLogin,
+       7   createSession,
+       8   destroySession,
+       9   changePassword,
+      10   requireUser,
+     … +64 lines (ctrl+o to expand)
+
+● Write(app\login\page.js)
+  ⎿  Wrote 67 lines to app\login\page.js
+       1 import Link from 'next/link';
+       2 import { loginAction } from '@/app/actions/auth';
+       3 
+       4 export const metadata = { title: 'Login - ERP System' };
+       5 
+       6 export default async function LoginPage({ searchParams }) {
+       7   const { error, registered } = await searchParams;
+       8 
+       9   return (
+      10     <div className="login-page">
+     … +60 lines (ctrl+o to expand)
+● Write(app\register\page.js)
+  ⎿  Wrote 86 lines to app\register\page.js
+       1 import Link from 'next/link';
+       2 import { registerAction } from '@/app/actions/auth';
+       3 
+       4 export const metadata = { title: 'Register - ERP System' };
+       5 
+       6 export default async function RegisterPage({ searchParams }) {
+       7   const { error } = await searchParams;
+       8 
+       9   return (
+      10     <div className="login-page">
+     … +78 lines (ctrl+o to expand)
+
+● Write(app\components\BodyClass.js)
+  ⎿  Wrote 16 lines to app\components\BodyClass.js
+       1 'use client';
+       2 
+       4 
+       5 // AdminLTE's fixed/expand sidebar behavior is driven by classes
+          on <body>,
+         classless
+       7 // login/register pages), so portal/admin layouts apply their cl
+         asses here.
+       9   useEffect(() => {
+      10     const classes = className.split(' ').filter(Boolean);
+     … +9 lines (ctrl+o to expand)
+
+● Write(app\components\Sidebar.js)
+  ⎿  Wrote 50 lines to app\components\Sidebar.js
+       1 import Link from 'next/link';
+       2 
+       3 function SidebarGroup({ group }) {
+       4   return (
+       5     <li className="nav-item">
+       7         {group.icon && <i className={`nav-icon ${group.icon}`} /
+         >}
+       8         <p>
+       9           {group.label}
+      10           <i className="nav-arrow bi bi-chevron-right" />
+     … +42 lines (ctrl+o to expand)
+
+● Write(app\components\Topbar.js)
+  ⎿  Wrote 42 lines to app\components\Topbar.js
+       1 import Link from 'next/link';
+       2 import { logoutAction } from '@/app/actions/auth';
+       3 
+         abel }) {
+       5   return (
+       6     <nav className="app-header navbar navbar-expand bg-body">
+       7       <div className="container-fluid">
+       9           <li className="nav-item">
+      10             <a className="nav-link" data-lte-toggle="sidebar" hr
+         ef="#" role="button">
+     … +36 lines (ctrl+o to expand)
+
+● Update(lib\auth.js)
+  ⎿  Added 8 lines
+      113    return Boolean(user?.permissions?.has(functionCode));
+      114  }
+      115  
+      116 +export function hasAnyPermissionPrefix(user, prefix) {        
+      117 +  if (!user?.permissions) return false;                       
+      118 +  for (const code of user.permissions) {                      
+      119 +    if (code.startsWith(prefix)) return true;                 
+      120 +  }                                                           
+      121 +  return false;                                               
+      122 +}                                                             
+      123 +                                                              
+      124  export async function requirePermission(functionCode) {
+      125    const user = await requireUser();
+      126    if (!hasPermission(user, functionCode)) {
+
+● Now the portal and admin layouts.
+
+● Write(app\portal\layout.js)
+  ⎿  Wrote 33 lines to app\portal\layout.js
+       1 import { redirect } from 'next/navigation';
+       2 import { getCurrentUser, hasAnyPermissionPrefix } from '@/lib/au
+         th';
+       3 import { getPortalSidebar } from '@/lib/sidebar';
+       4 import BodyClass from '@/app/components/BodyClass';
+       6 import Topbar from '@/app/components/Topbar';
+       7 
+       8 export default async function PortalLayout({ children }) {
+       9   const user = await getCurrentUser();
+      10   if (!user) redirect('/login');
+     … +24 lines (ctrl+o to expand)
+
+● Write(app\admin\layout.js)
+  ⎿  Wrote 29 lines to app\admin\layout.js
+       1 import { redirect } from 'next/navigation';
+       2 import { getCurrentUser, hasAnyPermissionPrefix } from '@/lib/au
+         th';
+       3 import { getAdminSidebar } from '@/lib/sidebar';
+       4 import BodyClass from '@/app/components/BodyClass';
+       6 import Topbar from '@/app/components/Topbar';
+       7 
+       8 export default async function AdminLayout({ children }) {
+       9   const user = await getCurrentUser();
+      10   if (!user) redirect('/login');
+     … +21 lines (ctrl+o to expand)
+
+● Write(app\change-password\page.js)
+  ⎿  Wrote 70 lines to app\change-password\page.js
+       1 import { redirect } from 'next/navigation';
+       2 import { getCurrentUser } from '@/lib/auth';
+       3 import { changePasswordAction } from '@/app/actions/auth';
+       5 import Topbar from '@/app/components/Topbar';
+       6 
+       7 export const metadata = { title: 'Change Password - ERP System' 
+         };
+       9 export default async function ChangePasswordPage({ searchParams 
+         }) {
+      10   const user = await getCurrentUser();
+     … +64 lines (ctrl+o to expand)
+
+● Write(app\portal\page.js)
+  ⎿  Wrote 39 lines to app\portal\page.js
+       1 import Link from 'next/link';
+       2 import { getCurrentUser } from '@/lib/auth';
+       3 
+       4 export default async function PortalHome() {
+       5   const user = await getCurrentUser();
+       7   return (
+       8     <div className="py-4">
+       9       <h2>歡迎，{user.full_name}</h2>
+      10       <p className="text-muted">請由左側選單選擇欲使用的功能。</
+         p>
+     … +35 lines (ctrl+o to expand)
+
+● Write(app\admin\page.js)
+  ⎿  Wrote 33 lines to app\admin\page.js
+       1 import Link from 'next/link';
+       2 
+       3 export default function AdminHome() {
+       4   return (
+       5     <div className="py-4">
+       7       <p className="text-muted">管理使用者、角色與功能權限。</p>
+       8       <div className="row mt-4">
+       9         <div className="col-md-4">
+      10           <Link href="/admin/users" className="card text-decorat
+         ion-none mb-3">
+     … +26 lines (ctrl+o to expand)
+
+● Write(lib\rbac.js)
+  ⎿  Wrote 125 lines to lib\rbac.js
+       1 import bcrypt from 'bcryptjs';
+       2 import { db } from './db';
+       3 
+       4 // ---------- Users ----------
+       5 export function listUsers() {
+       7     .prepare(
+       8       `SELECT u.id, u.username, u.email, u.full_name, u.is_activ
+         e, u.created_at,
+       9               GROUP_CONCAT(r.name, ', ') AS role_names
+      10        FROM users u
+     … +135 lines (ctrl+o to expand)
+
+● Write(app\actions\rbac.js)
+  ⎿  Wrote 94 lines to app\actions\rbac.js
+       1 'use server';
+       2 
+       3 import { redirect } from 'next/navigation';
+       4 import { revalidatePath } from 'next/cache';
+       5 import { requirePermission } from '@/lib/auth';
+       6 import {
+       7   createUserByAdmin,
+       8   updateUserByAdmin,
+       9   deleteUser,
+      10   createRole,
+     … +94 lines (ctrl+o to expand)
+
+● Write(app\admin\users\page.js)
+  ⎿  Wrote 51 lines to app\admin\users\page.js
+       1 import Link from 'next/link';
+       2 import { listUsers } from '@/lib/rbac';
+       3 import { deleteUserAction } from '@/app/actions/rbac';
+       4 
+       5 export default async function UsersPage() {
+       7 
+       8   return (
+       9     <div className="py-4">
+      10       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+     … +44 lines (ctrl+o to expand)
+
+● Write(app\admin\users\new\page.js)
+  ⎿  Wrote 52 lines to app\admin\users\new\page.js
+       1 import { listRoles } from '@/lib/rbac';
+       2 import { createUserAction } from '@/app/actions/rbac';
+       3 
+       4 export default async function NewUserPage({ searchParams }) {
+       5   const { error } = await searchParams;
+       6   const roles = listRoles();
+       7 
+       8   return (
+       9     <div className="py-4" style={{ maxWidth: 560 }}>
+      10       <h2>新增使用者</h2>
+     … +47 lines (ctrl+o to expand)
+
+● Write(app\admin\users\[id]\page.js)
+  ⎿  Wrote 74 lines to app\admin\users\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getUser, listRoles } from '@/lib/rbac';
+       3 import { updateUserAction } from '@/app/actions/rbac';
+       4 
+       5 export default async function EditUserPage({ params, searchParam
+       6   const { id } = await params;
+       7   const { error } = await searchParams;
+       8   const user = getUser(Number(id));
+       9   if (!user) notFound();
+      10   const roles = listRoles();
+     … +66 lines (ctrl+o to expand)
+
+● Now roles pages (list/new/edit) and the read-only functions page.
+● Write(app\admin\roles\page.js)
+  ⎿  Wrote 47 lines to app\admin\roles\page.js
+       1 import Link from 'next/link';
+       2 import { listRoles } from '@/lib/rbac';
+       3 import { deleteRoleAction } from '@/app/actions/rbac';
+       4 
+       5 export default async function RolesPage() {
+       7 
+       8   return (
+       9     <div className="py-4">
+      10       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+     … +39 lines (ctrl+o to expand)
+
+● Write(app\components\FunctionCheckboxes.js)
+  ⎿  Wrote 36 lines to app\components\FunctionCheckboxes.js
+       1 function groupByModule(functions) {
+       2   const groups = new Map();
+       3   for (const fn of functions) {
+       4     if (!groups.has(fn.module)) groups.set(fn.module, []);
+       5     groups.get(fn.module).push(fn);
+       7   return [...groups.entries()];
+       8 }
+       9 
+      10 export default function FunctionCheckboxes({ functions, selected
+         Ids = [] }) {
+     … +29 lines (ctrl+o to expand)
+
+● Write(app\admin\roles\new\page.js)
+  ⎿  Wrote 30 lines to app\admin\roles\new\page.js
+       1 import { listFunctions } from '@/lib/rbac';
+       2 import { createRoleAction } from '@/app/actions/rbac';
+       3 import FunctionCheckboxes from '@/app/components/FunctionCheckbo
+         xes';
+       4 
+       6   const { error } = await searchParams;
+       7   const functions = listFunctions();
+       8 
+       9   return (
+      10     <div className="py-4" style={{ maxWidth: 640 }}>
+     … +23 lines (ctrl+o to expand)
+
+● Write(app\admin\roles\[id]\page.js)
+  ⎿  Wrote 46 lines to app\admin\roles\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getRole, listFunctions } from '@/lib/rbac';
+       3 import { updateRoleAction } from '@/app/actions/rbac';
+         xes';
+       5 
+       6 export default async function EditRolePage({ params, searchParam
+         s }) {
+       8   const { error } = await searchParams;
+       9   const role = getRole(Number(id));
+      10   if (!role) notFound();
+     … +39 lines (ctrl+o to expand)
+
+● Write(app\admin\functions\page.js)
+  ⎿  Wrote 34 lines to app\admin\functions\page.js
+       1 import { listFunctions } from '@/lib/rbac';
+       2 
+       3 export default async function FunctionsPage() {
+       4   const functions = listFunctions();
+       5 
+       7     <div className="py-4">
+       8       <h2>功能權限管理</h2>
+       9       <p className="text-muted">
+      10         功能清單來自前台／後台的選單設定（JSON 檔），新增功能請
+         調整選單設定。
+     … +25 lines (ctrl+o to expand)
+
+● Before building the three business modules, let me sanity-check the foundation
+  compiles and the seeded admin login works.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Server's up, redirecting / to /login as expected (307).
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Login page renders with AdminLTE assets loaded. Now let's exercise the actual
+  login flow end-to-end with the seeded admin account.
+
+  Read 1 file, ran 3 shell commands (ctrl+o to expand)
+
+● Login works — session cookie set and redirected to /portal. Let's confirm the
+  portal loads with the sidebar and permissions filtered correctly.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Write(lib\inventory.js)
+  ⎿  Wrote 787 lines to lib\inventory.js
+       1 import { db, nextDocNo } from './db';
+       2 
+       3 // ---------- Item master ----------
+       4 export function listItems({ activeOnly = false } = {}) {
+       5   const where = activeOnly ? 'WHERE is_active = 1' : '';
+         code`).all();
+       7 }
+       8 
+       9 export function getItem(id) {
+      10   return db.prepare('SELECT * FROM items WHERE id = ?').get(id);
+     … +893 lines (ctrl+o to expand)
+
+● Write(app\actions\inventory.js)
+  ⎿  Wrote 236 lines to app\actions\inventory.js
+       1 'use server';
+       2 
+       3 import { redirect } from 'next/navigation';
+       4 import { revalidatePath } from 'next/cache';
+       5 import { requirePermission } from '@/lib/auth';
+       6 import {
+       7   createItem,
+       8   updateItem,
+       9   createWarehouse,
+      10   updateWarehouse,
+     … +239 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\dashboard\page.js)
+  ⎿  Wrote 109 lines to app\portal\inventory\dashboard\page.js
+       1 import { getInventoryDashboard } from '@/lib/inventory';
+       2 
+       3 export default async function InventoryDashboardPage() {
+       4   const d = getInventoryDashboard();
+       5 
+       6   return (
+       7     <div className="py-4">
+       8       <h2>庫存儀表板</h2>
+       9       <div className="row mt-3">
+      10         <div className="col-md-3">
+     … +100 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\items\page.js)  ⎿  Wrote 47 lines to app\portal\inventory\items\page.js
+       1 import Link from 'next/link';
+       2 import { listItems } from '@/lib/inventory';
+       3 
+       4 export default async function ItemsPage() {
+       5   const items = listItems();
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>商品主檔</h2>
+     … +40 lines (ctrl+o to expand)
+
+● Write(app\components\ItemFormFields.js)
+  ⎿  Wrote 119 lines to app\components\ItemFormFields.js
+       1 const COSTING_METHODS = ['fifo', 'lifo', 'weighted_average', 'st
+         andard', 'moving_average'];
+       2 
+       3 export default function ItemFormFields({ item }) {
+       4   return (
+       6       <div className="row">
+       7         <div className="col-md-6 mb-3">
+       8           <label className="form-label">商品名稱</label>
+       9           <input
+      10             type="text"
+     … +113 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\items\new\page.js)
+  ⎿  Wrote 23 lines to app\portal\inventory\items\new\page.js
+       1 import { createItemAction } from '@/app/actions/inventory';
+       2 import ItemFormFields from '@/app/components/ItemFormFields';
+       3 
+       4 export default async function NewItemPage({ searchParams }) {
+       5   const { error } = await searchParams;
+       7   return (
+       8     <div className="py-4" style={{ maxWidth: 720 }}>
+       9       <h2>新增商品</h2>
+      10       {error && <div className="alert alert-danger">{error}</div
+         >}
+     … +14 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\items\[id]\page.js)
+  ⎿  Wrote 73 lines to app\portal\inventory\items\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getItem, searchInventory } from '@/lib/inventory';
+       3 import { updateItemAction, generateBarcodeAction } from '@/app/a
+       4 import ItemFormFields from '@/app/components/ItemFormFields';
+       5 
+       6 export default async function EditItemPage({ params, searchParam
+         s }) {
+       8   const { error } = await searchParams;
+       9   const item = getItem(Number(id));
+      10   if (!item) notFound();
+     … +67 lines (ctrl+o to expand)
+
+● Now warehouses list/new/edit pages.
+
+● Write(app\portal\inventory\warehouses\page.js)
+  ⎿  Wrote 43 lines to app\portal\inventory\warehouses\page.js
+       1 import Link from 'next/link';
+       2 import { listWarehouses } from '@/lib/inventory';
+       3 
+       4 export default async function WarehousesPage() {
+       5   const warehouses = listWarehouses();
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>倉庫管理</h2>
+     … +36 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\warehouses\new\page.js)
+  ⎿  Wrote 29 lines to app\portal\inventory\warehouses\new\page.js
+       1 import { createWarehouseAction } from '@/app/actions/inventory';
+       2 
+       3 export default async function NewWarehousePage({ searchParams })
+       4   const { error } = await searchParams;
+       5 
+       6   return (
+       7     <div className="py-4" style={{ maxWidth: 480 }}>
+       9       {error && <div className="alert alert-danger">{error}</div
+         >}
+      10       <form action={createWarehouseAction}>
+     … +22 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\warehouses\[id]\page.js)
+  ⎿  Wrote 54 lines to app\portal\inventory\warehouses\[id]\page.js
+      1 import { notFound } from 'next/navigation';
+      2 import { getWarehouse } from '@/lib/inventory';
+      3 import { updateWarehouseAction } from '@/app/actions/inventory';
+      4 
+      5 export default async function EditWarehousePage({ params, searchP
+        arams }) {
+      6   const { id } = await params;
+      7   const { error } = await searchParams;
+      8   const warehouse = getWarehouse(Number(id));
+      9   if (!warehouse) notFound();
+     … +45 lines (ctrl+o to expand)
+
+● Update(lib\inventory.js)
+  ⎿  Added 16 lines
+      631    return { current: current || null, history };
+      632  }
+      633  
+      634 +// ---------- Transaction history ----------                  
+      635 +export function listTransactions({ type, limit = 100 } = {}) {
+      636 +  const where = type ? 'WHERE t.txn_type = ?' : '';           
+      637 +  const args = type ? [type, limit] : [limit];                
+      638 +  return db                                                   
+      639 +    .prepare(                                                 
+      640 +      `SELECT t.*, i.item_code, i.item_name, w.warehouse_name 
+      641 +       FROM inventory_transactions t                          
+      642 +       JOIN items i ON i.id = t.item_id                       
+      643 +       JOIN warehouses w ON w.id = t.warehouse_id             
+      644 +       ${where}                                               
+      645 +       ORDER BY t.id DESC LIMIT ?`                            
+      646 +    )                                                         
+      647 +    .all(...args);                                            
+      648 +}                                                             
+      649 +                                                              
+      650  // ---------- Valuation / reorder / search / dashboard / repor
+           ts ----------
+      651  export function calculateInventoryValue({ warehouseId, itemId 
+           } = {}) {
+      652    const conditions = [];
+
+● Now the receipt/issue/transfer/adjustment list+new pages. I'll build a shared
+  item/warehouse <select> pattern inline since it's simple enough.
+
+● Write(app\portal\inventory\receipts\page.js)
+  ⎿  Wrote 47 lines to app\portal\inventory\receipts\page.js
+       1 import Link from 'next/link';
+       2 import { listTransactions } from '@/lib/inventory';
+       3 
+       4 export default async function ReceiptsPage() {
+       5   const receipts = listTransactions({ type: 'receipt' });
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>入庫管理</h2>
+     … +39 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\receipts\new\page.js)
+  ⎿  Wrote 70 lines to app\portal\inventory\receipts\new\page.js
+       1 import { listItems, listWarehouses } from '@/lib/inventory';
+       2 import { receiveInventoryAction } from '@/app/actions/inventory'
+         ;
+       3 
+       4 export default async function NewReceiptPage({ searchParams }) {
+       6   const items = listItems({ activeOnly: true });
+       7   const warehouses = listWarehouses({ activeOnly: true });
+       8 
+       9   return (
+      10     <div className="py-4" style={{ maxWidth: 560 }}>
+     … +67 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\issues\page.js)
+  ⎿  Wrote 43 lines to app\portal\inventory\issues\page.js
+       1 import Link from 'next/link';
+       2 import { listTransactions } from '@/lib/inventory';
+       3 
+       4 export default async function IssuesPage() {
+       5   const issues = listTransactions({ type: 'issue' });
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>出庫管理</h2>
+     … +35 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\issues\new\page.js)
+  ⎿  Wrote 52 lines to app\portal\inventory\issues\new\page.js
+       1 import { listItems, listWarehouses } from '@/lib/inventory';
+       2 import { issueInventoryAction } from '@/app/actions/inventory';
+       3 
+       4 export default async function NewIssuePage({ searchParams }) {
+       5   const { error } = await searchParams;
+       6   const items = listItems({ activeOnly: true });
+       7   const warehouses = listWarehouses({ activeOnly: true });
+       8 
+       9   return (
+      10     <div className="py-4" style={{ maxWidth: 560 }}>
+     … +46 lines (ctrl+o to expand)
+
+● Transfers and adjustments pages next.
+
+● Write(app\portal\inventory\transfers\page.js)
+  ⎿  Wrote 43 lines to app\portal\inventory\transfers\page.js
+       1 import Link from 'next/link';
+       2 import { listTransactions } from '@/lib/inventory';
+       3 
+       5   const transfersOut = listTransactions({ type: 'transfer_out' }
+         );
+       6 
+       7   return (
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>庫存調撥</h2>
+     … +35 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\transfers\new\page.js)
+  ⎿  Wrote 60 lines to app\portal\inventory\transfers\new\page.js
+       1 import { listItems, listWarehouses } from '@/lib/inventory';
+       2 import { transferInventoryAction } from '@/app/actions/inventory
+         ';
+       4 export default async function NewTransferPage({ searchParams }) 
+         {
+       5   const { error } = await searchParams;
+       6   const items = listItems({ activeOnly: true });
+       8 
+       9   return (
+      10     <div className="py-4" style={{ maxWidth: 560 }}>
+     … +54 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\adjustments\page.js)
+  ⎿  Wrote 43 lines to app\portal\inventory\adjustments\page.js
+       1 import Link from 'next/link';
+       2 import { listTransactions } from '@/lib/inventory';
+       3 
+       4 export default async function AdjustmentsPage() {
+       5   const adjustments = listTransactions({ type: 'adjustment' });
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>庫存調整</h2>
+     … +35 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\adjustments\new\page.js)
+  ⎿  Wrote 49 lines to app\portal\inventory\adjustments\new\page.js
+       1 import { listItems, listWarehouses } from '@/lib/inventory';
+       2 import { adjustInventoryAction } from '@/app/actions/inventory';
+       3 
+       4 export default async function NewAdjustmentPage({ searchParams }
+         ) {
+       6   const items = listItems({ activeOnly: true });
+       7   const warehouses = listWarehouses({ activeOnly: true });
+       8 
+       9   return (
+      10     <div className="py-4" style={{ maxWidth: 560 }}>
+     … +44 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\cycle-counts\page.js)
+  ⎿  Wrote 41 lines to app\portal\inventory\cycle-counts\page.js
+       1 import Link from 'next/link';
+       2 import { listCycleCounts } from '@/lib/inventory';
+       3 
+       4 export default async function CycleCountsPage() {
+       5   const counts = listCycleCounts();
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>循環盤點</h2>
+     … +34 lines (ctrl+o to expand)
+● Write(app\portal\inventory\cycle-counts\new\page.js)
+  ⎿  Wrote 89 lines to app\portal\inventory\cycle-counts\new\page.js
+       1 import { listWarehouses, searchInventory } from '@/lib/inventory
+       2 import { performCycleCountAction } from '@/app/actions/inventory
+         ';
+       4 export default async function NewCycleCountPage({ searchParams }
+         ) {
+       6   const warehouses = listWarehouses({ activeOnly: true });
+       7   const selectedWarehouseId = warehouseId ? Number(warehouseId) 
+       8   const stock = selectedWarehouseId ? searchInventory({ warehous
+         eId: selectedWarehouseId }) : [];
+      10   return (
+     … +85 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\cycle-counts\[id]\page.js)
+  ⎿  Wrote 48 lines to app\portal\inventory\cycle-counts\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getCycleCount } from '@/lib/inventory';
+       3 import { approveCycleCountAction } from '@/app/actions/inventory
+         ';
+       4 
+       6   const { id } = await params;
+       7   const count = getCycleCount(Number(id));
+       8   if (!count) notFound();
+       9 
+      10   return (
+     … +40 lines (ctrl+o to expand)
+
+● Now the physical-counts pages, mirroring cycle counts but warehouse-wide
+  freeze/complete.
+
+● Write(app\portal\inventory\physical-counts\page.js)
+  ⎿  Wrote 39 lines to app\portal\inventory\physical-counts\page.js
+       1 import Link from 'next/link';
+       2 import { listPhysicalInventories } from '@/lib/inventory';
+       3 
+       4 export default async function PhysicalCountsPage() {
+       5   const counts = listPhysicalInventories();
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>全面盤點</h2>
+     … +32 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\physical-counts\new\page.js)
+  ⎿  Wrote 80 lines to app\portal\inventory\physical-counts\new\page.js
+       1 import { listWarehouses, searchInventory } from '@/lib/inventory
+       2 import { performPhysicalCountAction } from '@/app/actions/invent
+         ory';
+       4 export default async function NewPhysicalCountPage({ searchParam
+         s }) {
+       6   const warehouses = listWarehouses({ activeOnly: true });
+       7   const selectedWarehouseId = warehouseId ? Number(warehouseId) 
+       8   const stock = selectedWarehouseId ? searchInventory({ warehous
+         eId: selectedWarehouseId }) : [];
+      10   return (
+     … +79 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\physical-counts\[id]\page.js)
+  ⎿  Wrote 46 lines to app\portal\inventory\physical-counts\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getPhysicalInventory } from '@/lib/inventory';
+       3 import { completePhysicalCountAction } from '@/app/actions/inven
+       4 
+       5 export default async function PhysicalCountDetailPage({ params }
+         ) {
+       6   const { id } = await params;
+       8   if (!pi) notFound();
+       9 
+      10   return (
+     … +38 lines (ctrl+o to expand)
+
+● Now the reorder-suggestion and reports pages.
+
+● Write(app\portal\inventory\reorder\page.js)
+  ⎿  Wrote 45 lines to app\portal\inventory\reorder\page.js
+       1 import { generateReorderSuggestion } from '@/lib/inventory';
+       2 
+       3 export default async function ReorderPage() {
+       4   const suggestions = generateReorderSuggestion();
+       5 
+       7     <div className="py-4">
+       8       <h2>補貨建議</h2>
+       9       <p className="text-muted">
+      10         依可用庫存、再訂購點與安全庫存計算：建議採購量 = 再訂購
+         點 + 安全庫存 − 可用庫存。
+     … +36 lines (ctrl+o to expand)
+
+● Write(app\portal\inventory\reports\page.js)
+  ⎿  Wrote 131 lines to app\portal\inventory\reports\page.js
+       1 import { generateInventoryReport } from '@/lib/inventory';
+       2 
+       3 const REPORT_TYPES = [
+       4   { value: 'valuation', label: '庫存價值報表' },
+       5   { value: 'low_stock', label: '補貨建議報表' },
+       7   { value: 'turnover', label: '庫存週轉率報表' },
+       8 ];
+       9 
+      10 export default async function InventoryReportsPage({ searchParam
+         s }) {
+     … +123 lines (ctrl+o to expand)
+
+● Update(app\portal\inventory\reports\page.js)
+  ⎿  Added 5 lines, removed 7 lines
+      14    return (
+      15      <div className="py-4">
+      16        <h2>庫存報表</h2>
+      17 -      <form method="get" className="mb-3" style={{ maxWidth: 32
+         -0 }}>                                                          
+      18 -        <select name="type" className="form-select" defaultValu
+         -e={type} onChange="this.form.submit()">                        
+      17 +      <form method="get" className="d-flex gap-2 mb-3" style={{
+         + maxWidth: 420 }}>                                             
+      18 +        <select name="type" className="form-select" defaultValu
+         +e={type}>                                                      
+      19            {REPORT_TYPES.map((r) => (
+      20              <option key={r.value} value={r.value}>
+      21                {r.label}
+      22              </option>
+      23            ))}
+      24          </select>
+      25 -        <noscript>                                             
+      26 -          <button type="submit" className="btn btn-secondary mt
+         --2">                                                           
+      27 -            查詢                                               
+      28 -          </button>                                            
+      29 -        </noscript>                                            
+      25 +        <button type="submit" className="btn btn-secondary text
+         +-nowrap">                                                      
+      26 +          查詢                                                 
+      27 +        </button>                                              
+      28        </form>
+      29  
+      30        {type === 'valuation' && (
+
+● Let's smoke-test the Inventory module end-to-end via the running dev server
+  before moving on.
+
+  Made 4 scratchpad edits +154 -22, searched for 1 pattern, read 3 files, ran 11 shell commands (ctrl+o to expand)
+
+● Inventory module fully verified — warehouse/item creation, receipt, and issue
+  all work correctly through real Server Actions (100 received − 30 issued = 70
+  confirmed). Marking Inventory complete and moving to Purchase Order.
+● Write(lib\purchase.js)
+  ⎿  Wrote 583 lines to lib\purchase.js
+       1 import { db, nextDocNo } from './db';
+       2 import { getItem, receiveInventory } from './inventory';
+       3 
+       4 const APPROVAL_THRESHOLD = 100000;
+       5 
+       7 export function listSuppliers({ activeOnly = false } = {}) {
+       8   const where = activeOnly ? 'WHERE is_active = 1' : '';
+       9   return db.prepare(`SELECT * FROM suppliers ${where} ORDER BY s
+         upplier_code`).all();
+      10 }
+     … +689 lines (ctrl+o to expand)
+
+● Write(app\actions\purchase.js)
+  ⎿  Wrote 300 lines to app\actions\purchase.js
+       1 'use server';
+       2 
+       3 import { redirect } from 'next/navigation';
+       4 import { revalidatePath } from 'next/cache';
+       5 import { requirePermission } from '@/lib/auth';
+       6 import {
+       7   createSupplier,
+       8   updateSupplier,
+       9   createPurchaseRequisition,
+      10   approvePurchaseRequisition,
+     … +305 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\suppliers\page.js)
+  ⎿  Wrote 43 lines to app\portal\purchase\suppliers\page.js
+       1 import Link from 'next/link';
+       2 import { listSuppliers } from '@/lib/purchase';
+       3 
+       4 export default async function SuppliersPage() {
+       5   const suppliers = listSuppliers();
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>供應商管理</h2>
+     … +36 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\suppliers\new\page.js)
+  ⎿  Wrote 49 lines to app\portal\purchase\suppliers\new\page.js
+       1 import { createSupplierAction } from '@/app/actions/purchase';
+       2 
+       3 export default async function NewSupplierPage({ searchParams }) 
+       4   const { error } = await searchParams;
+       5 
+       6   return (
+       7     <div className="py-4" style={{ maxWidth: 560 }}>
+       9       {error && <div className="alert alert-danger">{error}</div
+         >}
+      10       <form action={createSupplierAction}>
+     … +46 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\suppliers\[id]\page.js)
+  ⎿  Wrote 86 lines to app\portal\purchase\suppliers\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getSupplier, generateSupplierScorecard } from '@/lib/pu
+         rchase';
+       4 
+       5 export default async function EditSupplierPage({ params, searchP
+         arams }) {
+       6   const { id } = await params;
+       8   const supplier = getSupplier(Number(id));
+       9   if (!supplier) notFound();
+      10   const scorecard = generateSupplierScorecard(supplier.id);
+     … +94 lines (ctrl+o to expand)
+
+● Update(app\actions\purchase.js)
+  ⎿  Added 7 lines, removed 5 lines
+      84  // ---------- Requisitions ----------
+      85  export async function createRequisitionAction(formData) {
+      86    const user = await requirePermission('purchase.requisitions')
+          ;
+      87 -  const lines = parseLines(formData, ['itemId', 'quantity', 'wa
+         -rehouseId']).map((l) => ({                                     
+      88 -    itemId: Number(l.itemId),                                  
+      89 -    quantity: Number(l.quantity),                              
+      90 -    warehouseId: l.warehouseId ? Number(l.warehouseId) : null, 
+      91 -  }));                                                         
+      87 +  const lines = parseLines(formData, ['itemId', 'quantity', 'wa
+         +rehouseId'])                                                   
+      88 +    .filter((l) => Number(l.quantity) > 0)                     
+      89 +    .map((l) => ({                                             
+      90 +      itemId: Number(l.itemId),                                
+      91 +      quantity: Number(l.quantity),                            
+      92 +      warehouseId: l.warehouseId ? Number(l.warehouseId) : null
+         +,                                                              
+      93 +    }));                                                       
+      94    try {
+      95      createPurchaseRequisition({
+      96        requesterId: user.id,
+
+● Similarly for PO line creation — filter zero-quantity rows.
+
+● Update(app\actions\purchase.js)
+  ⎿  Added 4 lines, removed 4 lines
+      160  // ---------- Purchase orders ----------
+      161  export async function createPurchaseOrderAction(formData) {
+      162    const user = await requirePermission('purchase.orders');
+      163 -  const lines = parseLines(formData, ['itemId', 'description',
+          - 'quantity', 'unitPrice', 'discount', 'warehouseId']).map(    
+      164 -    (l) => ({                                                 
+      163 +  const lines = parseLines(formData, ['itemId', 'description',
+          + 'quantity', 'unitPrice', 'discount', 'warehouseId'])         
+      164 +    .filter((l) => Number(l.quantity) > 0)                    
+      165 +    .map((l) => ({                                            
+      166        itemId: Number(l.itemId),
+      167        description: l.description,
+      168        quantity: Number(l.quantity),
+      169        unitPrice: Number(l.unitPrice),
+      170        discount: Number(l.discount || 0),
+      171        warehouseId: l.warehouseId ? Number(l.warehouseId) : nul
+           l,
+      171 -    })                                                        
+      172 -  );                                                          
+      172 +    }));                                                      
+      173    let id;
+      174    try {
+      175      id = createPurchaseOrder({
+
+● Write(app\components\LineItemRows.js)
+  ⎿  Wrote 64 lines to app\components\LineItemRows.js
+       1 // Renders a fixed number of blank line-item rows for order/requ
+         isition forms.
+         <= 0).
+       3 export default function LineItemRows({ items, warehouses, rowCou
+         nt = 5, withPrice = false, withWarehouse = false }) {
+       5     <table className="table table-bordered">
+       6       <thead>
+       7         <tr>
+       9           {withPrice && <th>說明</th>}
+      10           <th>數量</th>
+     … +61 lines (ctrl+o to expand)
+
+● Now the requisitions pages.
+
+● Write(app\portal\purchase\requisitions\page.js)
+  ⎿  Wrote 41 lines to app\portal\purchase\requisitions\page.js
+       1 import Link from 'next/link';
+       2 import { listPurchaseRequisitions } from '@/lib/purchase';
+       3 
+       4 export default async function RequisitionsPage() {
+       5   const prs = listPurchaseRequisitions();
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>請購單</h2>
+     … +34 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\requisitions\new\page.js)
+  ⎿  Wrote 40 lines to app\portal\purchase\requisitions\new\page.js
+       1 import { listItems, listWarehouses } from '@/lib/inventory';
+       2 import { createRequisitionAction } from '@/app/actions/purchase'
+         ;
+       4 
+       5 export default async function NewRequisitionPage({ searchParams 
+         }) {
+       6   const { error } = await searchParams;
+       8   const warehouses = listWarehouses({ activeOnly: true });
+       9 
+      10   return (
+     … +35 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\requisitions\[id]\page.js)
+  ⎿  Wrote 58 lines to app\portal\purchase\requisitions\[id]\page.js
+      1 import Link from 'next/link';
+      2 import { notFound } from 'next/navigation';
+      3 import { getPurchaseRequisition } from '@/lib/purchase';
+      4 import { approveRequisitionAction } from '@/app/actions/purchase'
+        ;
+      5 
+      6 export default async function RequisitionDetailPage({ params }) {
+      7   const { id } = await params;
+      8   const pr = getPurchaseRequisition(Number(id));
+      9   if (!pr) notFound();
+     … +51 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\rfq\page.js)
+  ⎿  Wrote 37 lines to app\portal\purchase\rfq\page.js
+       1 import Link from 'next/link';
+       2 import { listRFQs } from '@/lib/purchase';
+       3 
+       4 export default async function RFQsPage() {
+       5   const rfqs = listRFQs();
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>詢價比價</h2>
+     … +30 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\rfq\new\page.js)
+  ⎿  Wrote 22 lines to app\portal\purchase\rfq\new\page.js
+       1 import { createRFQAction } from '@/app/actions/purchase';
+       2 
+       3 export default async function NewRFQPage({ searchParams }) {
+       4   const { error, prId } = await searchParams;
+       5 
+       7     <div className="py-4" style={{ maxWidth: 480 }}>
+       8       <h2>新增詢價單</h2>
+       9       {error && <div className="alert alert-danger">{error}</div
+         >}
+      10       <form action={createRFQAction}>
+     … +13 lines (ctrl+o to expand)
+● Write(app\portal\purchase\rfq\[id]\page.js)
+  ⎿  Wrote 126 lines to app\portal\purchase\rfq\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getRFQ } from '@/lib/purchase';
+       3 import { listSuppliers } from '@/lib/purchase';
+       4 import { listItems } from '@/lib/inventory';
+       5 import { sendRFQAction, recordQuotationAction } from '@/app/acti
+       6 
+       7 export default async function RFQDetailPage({ params }) {
+       8   const { id } = await params;
+       9   const rfq = getRFQ(Number(id));
+      10   if (!rfq) notFound();
+     … +133 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\orders\page.js)
+  ⎿  Wrote 41 lines to app\portal\purchase\orders\page.js
+       1 import Link from 'next/link';
+       2 import { listPurchaseOrders } from '@/lib/purchase';
+       3 
+       4 export default async function PurchaseOrdersPage() {
+       5   const orders = listPurchaseOrders();
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>採購訂單</h2>
+     … +34 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\orders\new\page.js)
+  ⎿  Wrote 49 lines to app\portal\purchase\orders\new\page.js
+       1 import { listSuppliers } from '@/lib/purchase';
+       2 import { listItems, listWarehouses } from '@/lib/inventory';
+       3 import { createPurchaseOrderAction } from '@/app/actions/purchas
+       4 import LineItemRows from '@/app/components/LineItemRows';
+       5 
+       6 export default async function NewPurchaseOrderPage({ searchParam
+         s }) {
+       8   const suppliers = listSuppliers({ activeOnly: true });
+       9   const items = listItems({ activeOnly: true });
+      10   const warehouses = listWarehouses({ activeOnly: true });
+     … +45 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\orders\[id]\page.js)
+  ⎿  Wrote 110 lines to app\portal\purchase\orders\[id]\page.js
+       1 import Link from 'next/link';
+       2 import { notFound } from 'next/navigation';
+       3 import { getPurchaseOrder } from '@/lib/purchase';
+       4 import {
+       5   submitPurchaseOrderAction,
+       6   approvePurchaseOrderAction,
+       7   sendPurchaseOrderAction,
+       8   cancelPurchaseOrderAction,
+       9   closePurchaseOrderAction,
+      10 } from '@/app/actions/purchase';
+     … +106 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\receipts\page.js)
+  ⎿  Wrote 35 lines to app\portal\purchase\receipts\page.js
+       1 import Link from 'next/link';
+       2 import { listGoodsReceipts } from '@/lib/purchase';
+       3 
+       4 export default async function GoodsReceiptsPage() {
+       5   const receipts = listGoodsReceipts();
+       6 
+       7   return (
+       8     <div className="py-4">
+       9       <h2>收貨管理</h2>
+      10       <table className="table table-striped table-bordered">
+     … +27 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\receipts\new\page.js)
+  ⎿  Wrote 67 lines to app\portal\purchase\receipts\new\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getPurchaseOrder } from '@/lib/purchase';
+       3 import { listWarehouses } from '@/lib/inventory';
+       4 import { receiveGoodsAction } from '@/app/actions/purchase';
+       5 
+          }) {
+       7   const { error, poId } = await searchParams;
+       8   if (!poId) notFound();
+       9   const po = getPurchaseOrder(Number(poId));
+      10   if (!po) notFound();
+     … +61 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\receipts\[id]\page.js)
+  ⎿  Wrote 71 lines to app\portal\purchase\receipts\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getGoodsReceipt } from '@/lib/purchase';
+       3 import { qualityInspectionAction, returnToSupplierAction } from 
+       4 
+       5 export default async function GoodsReceiptDetailPage({ params })
+          {
+       6   const { id } = await params;
+       8   if (!grn) notFound();
+       9 
+      10   return (
+     … +76 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\invoices\page.js)
+  ⎿  Wrote 57 lines to app\portal\purchase\invoices\page.js
+       1 import Link from 'next/link';
+       2 import { listSupplierInvoices } from '@/lib/purchase';
+       3 import { schedulePaymentAction } from '@/app/actions/purchase';
+       4 
+       5 export default async function SupplierInvoicesPage({ searchParam
+       6   const { error } = await searchParams;
+       7   const invoices = listSupplierInvoices();
+       8 
+       9   return (
+      10     <div className="py-4">
+     … +55 lines (ctrl+o to expand)
+
+● Write(app\portal\purchase\invoices\new\page.js)
+  ⎿  Wrote 48 lines to app\portal\purchase\invoices\new\page.js
+       1 import { searchPurchaseOrders } from '@/lib/purchase';
+       2 import { processSupplierInvoiceAction } from '@/app/actions/purc
+         hase';
+       4 export default async function NewSupplierInvoicePage({ searchPar
+         ams }) {
+       5   const { error, poId } = await searchParams;
+       6   const orders = searchPurchaseOrders({ status: 'received' });
+       8   return (
+       9     <div className="py-4" style={{ maxWidth: 480 }}>
+      10       <h2>登錄供應商發票</h2>
+     … +45 lines (ctrl+o to expand)
+
+● Now the procurement dashboard.
+
+● Write(app\portal\purchase\dashboard\page.js)
+  ⎿  Wrote 88 lines to app\portal\purchase\dashboard\page.js
+       1 import { getProcurementDashboard } from '@/lib/purchase';
+       2 
+       3 export default async function ProcurementDashboardPage() {
+       4   const d = getProcurementDashboard();
+       5 
+       6   return (
+       7     <div className="py-4">
+       8       <h2>採購儀表板</h2>
+       9       <div className="row mt-3">
+      10         <div className="col-md-4">
+     … +79 lines (ctrl+o to expand)
+
+  Made 2 scratchpad edits +293 -2, ran 5 shell commands (ctrl+o to expand)
+
+● Server's back up with a fresh DB. Now let's run the full smoke test.
+
+  Made 1 scratchpad edit +12 -8, ran 8 shell commands (ctrl+o to expand)
+● Now update all call sites to use the renamed function.
+
+  Made 4 scratchpad edits +244 -39, ran 5 shell commands (ctrl+o to expand)
+
+● Purchase Order module fully verified end-to-end — supplier creation, PO
+  submit/approve/send workflow, goods receipt, quality inspection updating
+  inventory, and three-way-matched invoice processing all work correctly.
+  Marking Purchase Order complete and moving to Sales Order.
+
+● Write(lib\sales.js)
+  ⎿  Wrote 455 lines to lib\sales.js
+       1 import { db, nextDocNo } from './db';
+       2 import { getItem, searchInventory, reserveInventory, releaseRese
+         rvation, issueInventory } from './inventory';
+       4 const APPROVAL_THRESHOLD = 100000;
+       5 const VAT_RATE = 0.05;
+       6 
+       7 // ---------- Customers ----------
+       9   const where = activeOnly ? 'WHERE is_active = 1' : '';
+      10   return db.prepare(`SELECT * FROM customers ${where} ORDER BY c
+         ustomer_code`).all();
+     … +544 lines (ctrl+o to expand)
+
+● Write(app\actions\sales.js)
+  ⎿  Wrote 200 lines to app\actions\sales.js
+       1 'use server';
+       2 
+       3 import { redirect } from 'next/navigation';
+       4 import { revalidatePath } from 'next/cache';
+       5 import { requirePermission } from '@/lib/auth';
+       6 import {
+       7   createCustomer,
+       8   updateCustomer,
+       9   createSalesOrder,
+      10   submitOrder,
+     … +203 lines (ctrl+o to expand)
+
+● Write(app\portal\sales\customers\page.js)
+  ⎿  Wrote 43 lines to app\portal\sales\customers\page.js
+       1 import Link from 'next/link';
+       2 import { listCustomers } from '@/lib/sales';
+       3 
+       4 export default async function CustomersPage() {
+       5   const customers = listCustomers();
+       7   return (
+       8     <div className="py-4">
+       9       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+      10         <h2>客戶管理</h2>
+     … +36 lines (ctrl+o to expand)
+
+● Write(app\portal\sales\customers\new\page.js)
+  ⎿  Wrote 39 lines to app\portal\sales\customers\new\page.js
+       1 import { createCustomerAction } from '@/app/actions/sales';
+       2 
+       3 export default async function NewCustomerPage({ searchParams }) 
+       4   const { error } = await searchParams;
+       5 
+       6   return (
+       7     <div className="py-4" style={{ maxWidth: 560 }}>
+       9       {error && <div className="alert alert-danger">{error}</div
+         >}
+      10       <form action={createCustomerAction}>
+     … +34 lines (ctrl+o to expand)
+
+● Write(app\portal\sales\customers\[id]\page.js)
+  ⎿  Wrote 78 lines to app\portal\sales\customers\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getCustomer, getCustomerCredit } from '@/lib/sales';
+       3 import { updateCustomerAction } from '@/app/actions/sales';
+       4 
+       5 export default async function EditCustomerPage({ params, searchP
+       6   const { id } = await params;
+       7   const { error } = await searchParams;
+       8   const customer = getCustomer(Number(id));
+       9   if (!customer) notFound();
+      10   const credit = getCustomerCredit(customer.id);
+     … +82 lines (ctrl+o to expand)
+
+● Now sales orders list/new/[id].
+
+● Write(app\portal\sales\orders\page.js)
+  ⎿  Wrote 51 lines to app\portal\sales\orders\page.js
+       1 import Link from 'next/link';
+       2 import { listSalesOrders } from '@/lib/sales';
+       3 
+         {
+       5   const { message } = await searchParams;
+       6   const orders = listSalesOrders();
+       7 
+       9     <div className="py-4">
+      10       <div className="d-flex justify-content-between align-items
+         -center mb-3">
+     … +46 lines (ctrl+o to expand)
+
+● Write(app\portal\sales\orders\new\page.js)
+  ⎿  Wrote 44 lines to app\portal\sales\orders\new\page.js
+       1 import { listCustomers } from '@/lib/sales';
+       2 import { listItems, listWarehouses } from '@/lib/inventory';
+       3 import { createSalesOrderAction } from '@/app/actions/sales';
+       4 import LineItemRows from '@/app/components/LineItemRows';
+       5 
+         ) {
+       7   const { error } = await searchParams;
+       8   const customers = listCustomers({ activeOnly: true });
+       9   const items = listItems({ activeOnly: true });
+      10   const warehouses = listWarehouses({ activeOnly: true });
+     … +39 lines (ctrl+o to expand)
+
+● Write(app\portal\sales\orders\[id]\page.js)
+  ⎿  Wrote 127 lines to app\portal\sales\orders\[id]\page.js
+       1 import { notFound } from 'next/navigation';
+       2 import { getSalesOrder } from '@/lib/sales';
+       3 import {
+       4   submitOrderAction,
+       5   approveOrderAction,
+       6   cancelOrderAction,
+       7   closeOrderAction,
+       8   duplicateOrderAction,
+       9   createShipmentAction,
+      10   createInvoiceAction,
+     … +131 lines (ctrl+o to expand)
+
+● Write(app\portal\sales\orders\import\page.js)
+  ⎿  Wrote 28 lines to app\portal\sales\orders\import\page.js
+       1 import { importSalesOrdersAction } from '@/app/actions/sales';
+       2 
+       3 export default async function ImportSalesOrdersPage() {
+       5     <div className="py-4" style={{ maxWidth: 720 }}>
+       6       <h2>匯入銷售訂單</h2>
+       7       <p className="text-muted">
+       8         貼上 CSV 內容（含標題列），每列建立一張單一品項的草稿銷
+       9         <br />
+      10         <code>customerCode,itemCode,quantity,unitPrice,warehouse
+         Code</code>
+     … +21 lines (ctrl+o to expand)
+● Write(app\portal\sales\orders\export\route.js)
+  ⎿  Wrote 18 lines to app\portal\sales\orders\export\route.js
+      1 import { requirePermission } from '@/lib/auth';
+      2 import { exportSalesOrders } from '@/lib/sales';
+      3 
+      4 export async function GET() {
+      5   try {
+      6     await requirePermission('sales.orders');
+      7   } catch {
+      8     return new Response('Forbidden', { status: 403 });
+      9   }
+     … +9 lines (ctrl+o to expand)
+
+● Update(lib\sales.js)
+  ⎿  Added 24 lines
+      406    return results;
+      407  }
+      408  
+      409 +export function listShipments() {                             
+      410 +  return db                                                   
+      411 +    .prepare(                                                 
+      412 +      `SELECT sh.*, so.so_no, c.customer_name FROM shipments s
+          +h                                                             
+      413 +       JOIN sales_orders so ON so.id = sh.so_id               
+      414 +       JOIN customers c ON c.id = so.customer_id              
+      415 +       ORDER BY sh.created_at DESC`                           
+      416 +    )                                                         
+      417 +    .all();                                                   
+      418 +}                                                             
+      419 +                                                              
+      420 +export function listArInvoices() {                            
+      421 +  return db                                                   
+      422 +    .prepare(                                                 
+      423 +      `SELECT ai.*, so.so_no, c.customer_name,                
+      424 +              COALESCE((SELECT SUM(amount) FROM ar_receipts WH
+          +ERE invoice_id = ai.id), 0) AS received                       
+      425 +       FROM ar_invoices ai                                    
+      426 +       JOIN sales_orders so ON so.id = ai.so_id               
+      427 +       JOIN customers c ON c.id = ai.customer_id              
+      428 +       ORDER BY ai.created_at DESC`                           
+      429 +    )                                                         
+      430 +    .all();                                                   
+      431 +}                                                             
+      432 +                                                              
+      433  // ---------- Dashboard ----------
+      434  export function getSalesDashboard() {
+      435    const todayOrders = db.prepare(`SELECT COUNT(*) AS n FROM sa
+           les_orders WHERE date(order_date) = date('now')`).get().n;
+
+● Write(app\portal\sales\shipments\page.js)
+  ⎿  Wrote 39 lines to app\portal\sales\shipments\page.js
+       1 import Link from 'next/link';
+       2 import { listShipments } from '@/lib/sales';
+       3 
+       4 export default async function ShipmentsPage() {
+       5   const shipments = listShipments();
+       6 
+       7   return (
+       8     <div className="py-4">
+       9       <h2>出貨管理</h2>
+      10       <table className="table table-striped table-bordered">
+     … +30 lines (ctrl+o to expand)
+
+● Write(app\portal\sales\invoices\page.js)
+  ⎿  Wrote 57 lines to app\portal\sales\invoices\page.js
+       1 import { listArInvoices } from '@/lib/sales';
+       2 import { recordReceiptAction } from '@/app/actions/sales';
+       3 
+       4 export default async function ArInvoicesPage() {
+       5   const invoices = listArInvoices();
+       6 
+       7   return (
+       8     <div className="py-4">
+       9       <h2>應收發票</h2>
+      10       <table className="table table-striped table-bordered">
+     … +51 lines (ctrl+o to expand)
+
+● Now the sales dashboard.
+
+● Write(app\portal\sales\dashboard\page.js)
+  ⎿  Wrote 122 lines to app\portal\sales\dashboard\page.js
+       1 import { getSalesDashboard } from '@/lib/sales';
+       2 
+       3 export default async function SalesDashboardPage() {
+       4   const d = getSalesDashboard();
+       5 
+       6   return (
+       7     <div className="py-4">
+       8       <h2>銷售儀表板</h2>
+       9       <div className="row mt-3">
+      10         <div className="col-md-3">
+     … +114 lines (ctrl+o to expand)
+
+  Made 1 scratchpad edit +64 -2, ran 1 shell command (ctrl+o to expand)
+
+● All three modules verified end-to-end through real Server Actions — Inventory,
+  Purchase Order (full requisition→RFQ→PO→receipt→quality→invoice workflow),
+  and Sales Order (order→credit check→reserve→ship→invoice→receipt→close),
+  including correct inventory math across modules. Let me check the server log
+  for any warnings before wrapping up.
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+● Let me do one more critical check — verify RBAC actually restricts a non-admin
+  user's sidebar and blocks unauthorized actions, since that's a core
+  requirement from the spec.
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Update(lib\auth.js)
+  ⎿  Added 1 line, removed 1 line
+      105  
+      106  export async function requireUser() {
+      107    const user = await getCurrentUser();
+      108 -  if (!user) throw new Error('Not authenticated');            
+      108 +  if (!user) redirect('/login');                              
+      109    return user;
+      110  }
+      111  
+
+● Update(lib\auth.js)
+  ⎿  Added 1 line, removed 1 line
+      124  export async function requirePermission(functionCode) {
+      125    const user = await requireUser();
+      126    if (!hasPermission(user, functionCode)) {
+      127 -    throw new Error(`Forbidden: missing permission ${functionC
+          -ode}`);                                                       
+      127 +    redirect(`/portal?error=${encodeURIComponent('Forbidden: m
+          +issing permission ' + functionCode)}`);                       
+      128    }
+      129    return user;
+      130  }
+
+● Need to import redirect from next/navigation in lib/auth.js.
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(lib\auth.js)
+  ⎿  Added 1 line
+      1  import bcrypt from 'bcryptjs';
+      2  import jwt from 'jsonwebtoken';
+      3  import { cookies } from 'next/headers';
+      4 +import { redirect } from 'next/navigation';                     
+      5  import { db } from './db';
+      6  
+      7  const SESSION_COOKIE = 'erp_session';
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Full suite still passes after the auth fix. Now the RBAC restriction check
+  with the corrected script.
+
+  Read 1 file, ran 5 shell commands (ctrl+o to expand)
+● This exposed a real gap: portal pages had no read-side permission check — only
+  Server Actions (writes) and sidebar visibility were guarded, so a logged-in
+  user could browse directly to a module's URL even without menu access. The
+  cleanest fix, following Next.js 16's proxy.ts pattern, is a single
+  request-level gate reusing the sidebar JSON as the path→permission source of
+  truth, rather than editing 50+ page files individually.
+
+  Read 1 file (ctrl+o to expand)
+
+● Write(proxy.js)
+  ⎿  Wrote 75 lines to proxy.js
+       1 import { NextResponse } from 'next/server';
+       2 import jwt from 'jsonwebtoken';
+       4 import path from 'node:path';
+       5 import { db } from '@/lib/db';
+       6 
+         nsecure-secret-change-me';
+       8 
+       9 // Path -> permission-code map, derived from the same sidebar JS
+      10 // drive the menus, so a page's access rule can never drift from
+          its menu entry.
+     … +75 lines (ctrl+o to expand)
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● No proxy warnings so far, good sign. Now run the full smoke test to confirm
+  admin flows still work with the proxy in place.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Full workflow still passes with the proxy gate active. Now confirm the RBAC
+  read-side gap is actually closed.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● The gap is closed — unauthorized GET requests now redirect (307) with a clear
+  Forbidden message, while the permitted action (creating an item) still
+  succeeds. Let me check dev.log once more for any proxy-related errors before
+  finishing.
+
+  Searched for 1 pattern, read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● I'll add the SQLite runtime files to .gitignore since they're regenerated
+  data, not source.
+
+● Update(.gitignore)
+  ⎿  Added 5 lines
+      36  # vercel
+      37  .vercel
+      38  
+      39 +# sqlite runtime data (regenerated on first run)               
+      40 +/data/erp.db                                                   
+      41 +/data/erp.db-wal                                               
+      42 +/data/erp.db-shm                                               
+      43 +                                                               
+      44  # typescript
+      45  *.tsbuildinfo
+      46  next-env.d.ts
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Clean boot, no errors. Let's stop the dev server and leave the workspace ready
+  to hand off.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● The ERP system is built and fully verified. Here's the summary:
+
+  Stack: Next.js 16 (App Router, pure JavaScript, Server Actions),
+  better-sqlite3, AdminLTE 4 via CDN, JWT session cookies + bcrypt.
+
+  What's implemented, end-to-end tested via real HTTP flows against the running 
+  server:
+  - Auth & RBAC: register/login/logout/change-password; user/role/function admin
+  backend; sidebar menus are generated from data/sidebar-*.json (also the
+  source of truth for permission codes) and filtered per user; a proxy.js gate
+  enforces permissions on every /portal and /admin request (not just menu
+  visibility)
+  - Inventory: items, warehouses, receipts, issues, transfers, reservations,
+  adjustments, cycle counts, physical inventory, barcode, lot/serial tracking,
+  costing (FIFO/LIFO/weighted-avg/standard), reorder suggestions, dashboard,
+  reports
+  - Purchase Order: suppliers, requisitions, RFQ/quote comparison, PO lifecycle
+  (draft→submit→approve→send→receive→invoice→close), quality inspection,
+  three-way match, supplier scorecard, procurement dashboard
+  - Sales Order: customers, SO lifecycle
+  (draft→submit→approve/reserve→ship→invoice→close), credit checks, pricing/tax,
+  picking, shipment, AR receipts, CSV import/export, sales dashboard
+
+  All AI-labeled sections from the three skill specs (natural-language query, AI
+  recommendations, forecasting, anomaly detection) were deliberately excluded —
+  everything else was implemented as real, deterministic business logic.
+
+  To run it:
+  cd D:\0_AI\Books\SDD\src\ch5\ERP_Next.js
+  npm run dev
+  First run auto-seeds the database with an admin login: admin / admin123.
+
+  One thing worth flagging: the built-in JWT secret and admin password are
+  dev-only placeholders (SESSION_SECRET env var, seeded in lib/db.js) — set a
+  real SESSION_SECRET and rotate the admin password before any non-local use.
+
+✻ Sautéed for 44m 15s
+
+※ recap: Built the full ERP app (Inventory, Purchase Order, Sales Order) in Next.js per your specs, minus AI features, and verified it end-to-end. It's done and working — next step is just for you to run `npm run dev` and log in with admin/admin123. (disable recaps in /config)
+
+> /fast 
+  ⎿  Fast mode OFF

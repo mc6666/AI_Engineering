@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}申請 - {{ wf.name }}{% endblock %}
+{% block breadcrumb %}<a href="{% url 'apply_select' %}">提出申請</a> / {{ wf.name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-8">
+<div class="card p-4">
+  <h5 class="fw-bold mb-4">{{ wf.name }}</h5>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">主旨 <span class="text-danger">*</span></label>
+      <input type="text" name="subject" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">說明</label>
+      <textarea name="body" class="form-control" rows="4"></textarea>
+    </div>
+
+    {% if form_template and form_template.field_schema %}
+    <hr>
+    <h6 class="fw-semibold mb-3">申請表單</h6>
+    {% for field in form_template.field_schema %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label }}{% if field.required %} <span class="text-danger">*</span>{% endif %}</label>
+        {% if field.type == 'textarea' %}
+          <textarea name="{{ field.name }}" class="form-control" {% if field.required %}required{% endif %}></textarea>
+        {% elif field.type == 'select' %}
+          <select name="{{ field.name }}" class="form-select" {% if field.required %}required{% endif %}>
+            <option value="">請選擇</option>
+          </select>
+        {% elif field.type == 'checkbox' %}
+          <div class="form-check">
+            <input type="checkbox" name="{{ field.name }}" class="form-check-input" {% if field.required %}required{% endif %}>
+            <label class="form-check-label">{{ field.label }}</label>
+          </div>
+        {% else %}
+          <input type="{{ field.type }}" name="{{ field.name }}" class="form-control" {% if field.required %}required{% endif %}>
+        {% endif %}
+      </div>
+    {% endfor %}
+    {% endif %}
+
+    <hr>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary"><i class="bi bi-send me-1"></i>送出申請</button>
+      <a href="{% url 'apply_select' %}" class="btn btn-outline-secondary">取消</a>
+    </div>
+  </form>
+</div>
+</div>
+</div>
+{% endblock %}

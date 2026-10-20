@@ -1,0 +1,7 @@
+/* Light theme: default, high-contrast, neutral grey chrome. */
+QWidget { background-color: #f4f4f6; color: #202020; }
+QMainWindow, QDockWidget { background-color: #f4f4f6; }
+QToolBar { background-color: #e8e8ec; border: none; spacing: 4px; }
+QStatusBar { background-color: #e8e8ec; }
+QTreeWidget, QScrollArea { background-color: #ffffff; }
+QTabWidget::pane { border: 1px solid #cfcfd4; }

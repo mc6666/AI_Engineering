@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}循環盤點{% endblock %}
+{% block page_title %}循環盤點{% endblock %}
+{% block content %}
+<a href="{% url 'inventory:cycle_count_add' %}" class="btn btn-primary mb-3">建立循環盤點單</a>
+<table class="table table-bordered">
+<thead><tr><th>盤點單號</th><th>倉庫</th><th>方式</th><th>狀態</th><th>操作</th></tr></thead>
+<tbody>
+{% for cc in cycle_counts %}
+<tr><td>{{ cc.count_no }}</td><td>{{ cc.warehouse }}</td><td>{{ cc.get_method_display }}</td><td>{{ cc.get_status_display }}</td>
+<td><a href="{% url 'inventory:cycle_count_detail' cc.pk %}" class="btn btn-sm btn-secondary">檢視</a></td></tr>
+{% empty %}<tr><td colspan="5">尚無盤點單</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}銷售訂單明細{% endblock %}
+{% block page_title %}銷售訂單：{{ order.so_number }}（{{ order.get_status_display }}）{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <p>客戶：{{ order.customer }}｜訂單日期：{{ order.order_date }}｜需求交貨日：{{ order.required_date|default:'-' }}</p>
+    <p>業務人員：{{ order.salesperson }}｜出貨地址：{{ order.shipping_address }}</p>
+    <p>小計：{{ order.subtotal }}｜折扣：{{ order.discount }}｜運費：{{ order.freight }}｜總金額：{{ order.total_amount }}</p>
+    <p>稅額試算（列印發票用）：未稅金額 {{ tax.amount_excl_tax }}｜VAT(5%) {{ tax.vat_amount }}｜含稅總額 {{ tax.amount_incl_tax }}</p>
+    <p>客戶信用檢查：{% if credit.approved %}<span class="text-success">通過</span>{% else %}<span class="text-danger">未通過：{{ credit.reason }}</span>{% endif %}</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">訂單明細</div>
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>商品</th><th>倉庫</th><th>數量</th><th>單價</th><th>折扣</th><th>小計</th><th>可用庫存</th></tr></thead>
+      <tbody>
+      {% for line in order.items.all %}
+        <tr>
+          <td>{{ line.item }}</td><td>{{ line.warehouse }}</td><td>{{ line.quantity }}</td>
+          <td>{{ line.unit_price }}</td><td>{{ line.discount }}</td><td>{{ line.line_total }}</td>
+          <td>{{ line.available_qty }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">操作</div>
+  <div class="card-body">
+    {% if order.status == 'DRAFT' %}
+    <form method="post" action="{% url 'sales:order_submit' order.pk %}" class="d-inline">
+      {% csrf_token %}
+      <label class="form-check-label"><input type="checkbox" name="allow_backorder" class="form-check-input"> 允許缺貨接單</label>
+      <button class="btn btn-primary">送出訂單</button>
+    </form>
+    {% endif %}
+    {% if order.status == 'OPEN' %}
+    <form method="post" action="{% url 'sales:order_approve' order.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-success">核准訂單</button></form>
+    {% endif %}
+    {% if order.status == 'APPROVED' %}
+    <form method="post" action="{% url 'sales:order_picking_list' order.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-info">產生揀貨單</button></form>
+    {% endif %}
+    {% if order.status == 'PICKING' or order.status == 'PACKED' %}
+    <a href="{% url 'sales:order_ship' order.pk %}" class="btn btn-info">建立出貨</a>
+    {% endif %}
+    {% if order.status == 'SHIPPED' %}
+    <form method="post" action="{% url 'sales:order_invoice' order.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-success">開立發票</button></form>
+    {% endif %}
+    {% if order.status == 'INVOICED' %}
+    <form method="post" action="{% url 'sales:order_close' order.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-secondary">結案</button></form>
+    {% endif %}
+    {% if order.status == 'DRAFT' or order.status == 'OPEN' or order.status == 'APPROVED' or order.status == 'PICKING' or order.status == 'PACKED' %}
+    <form method="post" action="{% url 'sales:order_cancel' order.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-danger">取消訂單</button></form>
+    {% endif %}
+    <form method="post" action="{% url 'sales:order_duplicate' order.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-outline-secondary">複製訂單</button></form>
+  </div>
+</div>
+
+{% if order.picking_list %}
+<div class="card">
+  <div class="card-header">揀貨單</div>
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>商品</th><th>倉庫</th><th>揀貨數量</th></tr></thead>
+      <tbody>
+      {% for line in order.picking_list.lines.all %}
+        <tr><td>{{ line.item }}</td><td>{{ line.warehouse }}</td><td>{{ line.pick_qty }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if order.shipments.exists %}
+<div class="card">
+  <div class="card-header">出貨紀錄</div>
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>出貨單號</th><th>物流追蹤號碼</th><th>承運商</th><th>出貨日期</th></tr></thead>
+      <tbody>
+      {% for s in order.shipments.all %}
+        <tr><td>{{ s.shipment_no }}</td><td>{{ s.tracking_number }}</td><td>{{ s.carrier }}</td><td>{{ s.ship_date }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if order.invoices.exists %}
+<div class="card">
+  <div class="card-header">發票 / 收款資訊</div>
+  <div class="card-body p-0">
+    <table class="table mb-0">
+      <thead><tr><th>發票編號</th><th>發票日期</th><th>金額</th><th>已收款</th><th>未收款餘額</th><th>操作</th></tr></thead>
+      <tbody>
+      {% for inv in order.invoices.all %}
+        <tr>
+          <td>{{ inv.invoice_no }}</td><td>{{ inv.invoice_date }}</td><td>{{ inv.amount }}</td>
+          <td>{{ inv.paid_amount }}</td><td>{{ inv.outstanding }}</td>
+          <td><a href="{% url 'sales:invoice_payment' inv.pk %}" class="btn btn-sm btn-outline-primary">登記收款</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

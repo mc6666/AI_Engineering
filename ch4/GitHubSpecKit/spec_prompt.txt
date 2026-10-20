@@ -1,0 +1,24 @@
+0. 安裝 GitHub Spec Kit
+uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@v0.10.2
+
+1. 測試是否安裝OK：
+specify self check
+
+2. 建立專案：
+specify init my_project
+
+3. 制定憲章(Constitution)：
+/speckit-constitution Create principles focused on code quality, testing standards, user experience consistency, and performance requirements
+
+4. 制定基準規格(Baseline specification)
+/speckit-specify Build an Python web application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping on the main page. Albums are never in other nested albums. Within each album, photos are previewed in a tile-like interface.
+
+5. 規劃(Planning)：
+/speckit-plan The application uses NiceGUI package. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
+
+6. 拆解任務(Tasks)：
+/speckit-tasks
+
+7. 執行實作(Execute implementation)：
+/speckit-implement
+

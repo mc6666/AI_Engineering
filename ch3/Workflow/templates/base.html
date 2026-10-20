@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}企業簽核系統{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <style>
+    body { background-color: #f8f9fa; }
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: #1e293b;
+      color: #94a3b8;
+      position: fixed;
+      top: 0; left: 0;
+      padding-top: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+    .sidebar .brand {
+      background: #0f172a;
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+    .sidebar .nav-section {
+      padding: 0.75rem 1rem 0.25rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #475569;
+    }
+    .sidebar .nav-link {
+      color: #94a3b8;
+      padding: 0.5rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      border-radius: 0;
+      transition: all 0.15s;
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+      background: #334155;
+      color: #f1f5f9;
+    }
+    .main-content {
+      margin-left: 240px;
+      padding: 1.5rem;
+      min-height: 100vh;
+    }
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.6rem 1.5rem;
+      margin-left: 240px;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card { border: 1px solid #e2e8f0; border-radius: 0.5rem; }
+    .badge-pending { background: #f59e0b; }
+    .badge-approved { background: #10b981; }
+    .badge-rejected { background: #ef4444; }
+    .badge-draft { background: #94a3b8; }
+    .badge-withdrawn { background: #64748b; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+{% with emp=user.employee %}
+
+<div class="sidebar">
+  <div class="brand"><i class="bi bi-check2-square me-2"></i>企業簽核系統</div>
+
+  {% if emp.is_admin %}
+  <div class="nav-section">管理功能</div>
+  <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+    <i class="bi bi-speedometer2"></i> 儀表板
+  </a>
+  <a href="{% url 'workflow_list' %}" class="nav-link {% if 'workflow' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="bi bi-diagram-3"></i> 簽核類別制定
+  </a>
+  <a href="{% url 'org_tree' %}" class="nav-link {% if request.resolver_match.url_name == 'org_tree' %}active{% endif %}">
+    <i class="bi bi-diagram-2"></i> 樹狀組織表
+  </a>
+  <a href="{% url 'employee_list' %}" class="nav-link {% if 'employee' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="bi bi-people"></i> 員工維護
+  </a>
+  <a href="{% url 'admin_case_list' %}" class="nav-link {% if 'admin_case' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="bi bi-folder2-open"></i> 所有案件追蹤
+  </a>
+  {% else %}
+  <div class="nav-section">我的功能</div>
+  <a href="{% url 'user_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'user_dashboard' %}active{% endif %}">
+    <i class="bi bi-house"></i> 首頁
+  </a>
+  <a href="{% url 'apply_select' %}" class="nav-link {% if 'apply' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="bi bi-pencil-square"></i> 提出申請
+  </a>
+  <a href="{% url 'my_cases' %}" class="nav-link {% if request.resolver_match.url_name == 'my_cases' %}active{% endif %}">
+    <i class="bi bi-file-text"></i> 我的案件
+  </a>
+  <a href="{% url 'pending_approvals' %}" class="nav-link {% if 'approval' in request.resolver_match.url_name %}active{% endif %}">
+    <i class="bi bi-clipboard-check"></i> 待簽核案件
+  </a>
+  {% endif %}
+</div>
+
+<div class="topbar">
+  <span class="text-muted small">{% block breadcrumb %}{% endblock %}</span>
+  <div class="d-flex align-items-center gap-3">
+    <span class="small"><i class="bi bi-person-circle me-1"></i>{{ emp.name }}
+      {% if emp.is_admin %}<span class="badge bg-primary ms-1">管理者</span>{% endif %}
+    </span>
+    <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-secondary">登出</a>
+  </div>
+</div>
+
+{% endwith %}
+{% endif %}
+
+<div class="main-content">
+  {% if messages %}
+    {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show" role="alert">
+      {{ msg }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

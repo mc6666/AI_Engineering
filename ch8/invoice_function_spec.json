@@ -1,0 +1,156 @@
+{
+  "type": "function",
+  "name": "generate_invoice",
+  "description": "Generate a Taiwan electronic invoice and output as HTML file.",
+  "strict": true,
+  "parameters": {
+    "type": "object",
+    "required": [
+      "invoice_type",
+      "invoice_no",
+      "invoice_date",
+      "seller",
+      "buyer",
+      "tax_type",
+      "notes",
+      "items"
+    ],
+    "properties": {
+      "invoice_type": {
+        "type": "string",
+        "description": "Type of invoice, e.g., '二聯式' or '三聯式'",
+        "enum": [
+          "二聯式",
+          "三聯式"
+        ]
+      },
+      "invoice_no": {
+        "type": "string",
+        "description": "Invoice number"
+      },
+      "invoice_date": {
+        "type": "string",
+        "format": "date",
+        "description": "Invoice issue date in YYYY-MM-DD format"
+      },
+      "seller": {
+        "type": "object",
+        "description": "Seller company information",
+        "required": [
+          "name",
+          "tax_id",
+          "address",
+          "phone"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Seller's name"
+          },
+          "tax_id": {
+            "type": "string",
+            "description": "Seller's tax identification number"
+          },
+          "address": {
+            "type": "string",
+            "description": "Seller's address"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Seller's contact phone number"
+          }
+        },
+        "additionalProperties": false
+      },
+      "buyer": {
+        "type": "object",
+        "description": "Buyer company information",
+        "required": [
+          "name",
+          "tax_id",
+          "address"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Buyer's name"
+          },
+          "tax_id": {
+            "type": "string",
+            "description": "Buyer's tax identification number"
+          },
+          "address": {
+            "type": "string",
+            "description": "Buyer's address"
+          }
+        },
+        "additionalProperties": false
+      },
+      "tax_type": {
+        "type": "string",
+        "description": "Tax type for the invoice",
+        "enum": [
+          "應稅",
+          "零稅率",
+          "免稅"
+        ]
+      },
+      "notes": {
+        "type": "string",
+        "description": "Additional notes on the invoice"
+      },
+      "items": {
+        "type": "array",
+        "description": "List of all invoice line items",
+        "items": {
+          "type": "object",
+          "required": [
+            "name",
+            "description",
+            "quantity",
+            "unit_price",
+            "discount"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the item"
+            },
+            "description": {
+              "type": "string",
+              "description": "Description of the item"
+            },
+            "quantity": {
+              "type": "number",
+              "description": "Quantity of the item"
+            },
+            "unit_price": {
+              "type": "number",
+              "description": "Unit price of the item"
+            },
+            "discount": {
+              "type": "number",
+              "description": "Discount amount for this item",
+              "default": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "output_path": {
+        "type": "string",
+        "description": "Path of the generated HTML invoice file"
+      }
+    },
+    "required": [
+      "output_path"
+    ],
+    "additionalProperties": false
+  }
+}

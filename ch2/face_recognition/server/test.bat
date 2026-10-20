@@ -1,0 +1,1 @@
+curl -X POST "http://localhost:8000/detect" -H "accept: image/jpeg" -H "Content-Type: multipart/form-data" -F "file=@%1" --output %2

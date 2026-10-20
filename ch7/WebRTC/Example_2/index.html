@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <audio controls></audio>
+    </body>
+
+    <script>
+        const constraints = window.constraints = {
+          audio: true,
+          video: false
+        };
+
+        function handleSuccess(stream) {
+          const audioTracks = stream.getAudioTracks();
+          console.log('Got stream with constraints:', constraints);
+          console.log('Using audio device: ' + audioTracks[0].label);
+          const audio = document.querySelector("audio");
+          audio.srcObject = stream;
+          audio.play();
+        }
+
+        function handleError(error) {
+          const errorMessage = 
+            'navigator.MediaDevices.getUserMedia error: ' + error.message + ' ' + error.name;
+          document.getElementById('errorMsg').innerText = errorMessage;
+          console.log(errorMessage);
+        }
+
+        navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess, handleError);
+    </script>
+</html>

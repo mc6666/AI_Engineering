@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# testing
+coverage/
+playwright-report/
+test-results/
+
+# next.js
+.next/
+out/
+
+# production
+build/
+dist/
+
+# runtime data (local photos and database)
+data/
+
+# misc
+.DS_Store
+*.pem
+.env*
+!.env.local.example
+*.log
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+.scripts-out/

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}管理儀表板{% endblock %}
+{% block breadcrumb %}管理儀表板{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">管理儀表板</h4>
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card p-3 text-center">
+      <div class="fs-2 fw-bold text-primary">{{ total_employees }}</div>
+      <div class="text-muted small mt-1"><i class="bi bi-people me-1"></i>員工總數</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 text-center">
+      <div class="fs-2 fw-bold text-success">{{ total_workflows }}</div>
+      <div class="text-muted small mt-1"><i class="bi bi-diagram-3 me-1"></i>簽核類別</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 text-center">
+      <div class="fs-2 fw-bold text-info">{{ total_cases }}</div>
+      <div class="text-muted small mt-1"><i class="bi bi-folder2-open me-1"></i>案件總數</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 text-center">
+      <div class="fs-2 fw-bold text-warning">{{ pending_cases }}</div>
+      <div class="text-muted small mt-1"><i class="bi bi-hourglass-split me-1"></i>待審核案件</div>
+    </div>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-md-4">
+    <a href="{% url 'workflow_list' %}" class="card text-decoration-none p-3 d-flex flex-row align-items-center gap-3">
+      <i class="bi bi-diagram-3 fs-3 text-primary"></i>
+      <div><div class="fw-semibold text-dark">簽核類別制定</div><div class="text-muted small">管理流程與步驟</div></div>
+    </a>
+  </div>
+  <div class="col-md-4">
+    <a href="{% url 'org_tree' %}" class="card text-decoration-none p-3 d-flex flex-row align-items-center gap-3">
+      <i class="bi bi-diagram-2 fs-3 text-success"></i>
+      <div><div class="fw-semibold text-dark">組織樹狀表</div><div class="text-muted small">定義部門與主管</div></div>
+    </a>
+  </div>
+  <div class="col-md-4">
+    <a href="{% url 'employee_list' %}" class="card text-decoration-none p-3 d-flex flex-row align-items-center gap-3">
+      <i class="bi bi-people fs-3 text-info"></i>
+      <div><div class="fw-semibold text-dark">員工維護</div><div class="text-muted small">管理員工與帳號</div></div>
+    </a>
+  </div>
+</div>
+{% endblock %}

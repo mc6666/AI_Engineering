@@ -1,0 +1,10 @@
+user："Hi, my name is Sora."
+assistant："Hi, Sora! How can I help?"
+user：" Can you generate a random number between 0 and 100?"
+function_call："random_number_tool"
+assistant："81"
+user：" I live in New York City. What's the population of the city?"
+assistant：" New York City population is approximately **8.3 million**"
+user："我住哪裡？"
+transfer_to_chinese_assistant
+assistant："你住在美國紐約市。"

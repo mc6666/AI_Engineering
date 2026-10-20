@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}刪除供應商{% endblock %}
+{% block page_title %}刪除供應商{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}<p>確定要刪除供應商「{{ object.supplier_name }}」嗎？</p><button class="btn btn-danger">確定刪除</button> <a href="{% url 'purchase:supplier_list' %}" class="btn btn-secondary">取消</a></form>
+{% endblock %}

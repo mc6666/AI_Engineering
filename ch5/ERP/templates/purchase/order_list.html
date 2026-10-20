@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}採購訂單{% endblock %}
+{% block page_title %}採購訂單查詢{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <form method="get" class="row g-2">
+    <div class="col-auto">{{ form.po_number }}</div>
+    <div class="col-auto">{{ form.supplier }}</div>
+    <div class="col-auto">{{ form.status }}</div>
+    <div class="col-auto">{{ form.date_from }}</div>
+    <div class="col-auto">{{ form.date_to }}</div>
+    <div class="col-auto"><button class="btn btn-secondary">查詢</button></div>
+  </form>
+  <a href="{% url 'purchase:order_add' %}" class="btn btn-primary">建立採購訂單</a>
+</div>
+<table class="table table-bordered">
+<thead><tr><th>採購單號</th><th>供應商</th><th>訂單日期</th><th>採購人員</th><th>總金額</th><th>狀態</th><th>操作</th></tr></thead>
+<tbody>
+{% for po in orders %}
+<tr>
+<td><a href="{% url 'purchase:order_detail' po.pk %}">{{ po.po_number }}</a></td>
+<td>{{ po.supplier }}</td><td>{{ po.order_date }}</td><td>{{ po.buyer }}</td><td>{{ po.total_amount }}</td><td>{{ po.get_status_display }}</td>
+<td><a href="{% url 'purchase:order_detail' po.pk %}" class="btn btn-sm btn-secondary">檢視</a></td>
+</tr>
+{% empty %}<tr><td colspan="7">查無採購訂單</td></tr>{% endfor %}
+</tbody>
+</table>
+{% endblock %}
