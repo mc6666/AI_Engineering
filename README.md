@@ -34,3 +34,7 @@
 - 第十章介紹如何以檢索增強生成(RAG)建構知識庫，實作完整的RAG工作流程，包括詞嵌入(Embedding)、分塊(Chunking)、向量資料庫(Vector Database)、重新排序(Reranking)及語意搜尋(Semantic search)，並針對RAG有7個可能的失敗點提出各種RAG變形(Variants)作法，以提高RAG的準確率。
 - 第十一章介紹工程師應該如何重塑本職學能，IT部門應該如何進行組織變革，以因應新的軟體工程(SDD)及軟體開發生命週期(AI-DLC)。另外加個彩蛋，介紹Jev，它是一個System One決策模型，提供LLM以外的另類創新。
 
+### 注意事項
+- 各章參考資料：參考資料.pdf，便於讀者複製超連結。
+
+
